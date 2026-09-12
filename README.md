@@ -25,6 +25,26 @@ python starter.py                          # terminal 2
 The Worker runs on your machine, not in the container, so you can `kill -9` it from a second
 terminal while watching the Web UI. That action is the day-one lesson.
 
+## Or run them from a local page, without a terminal
+
+```bash
+python lab_server.py        # http://127.0.0.1:3000 — standard library only, nothing to install
+```
+
+Each lab gets a page with the exercise text and a **Run it here** panel: prepare this lab's
+virtualenv, start the Worker, run `starter.py`, and `kill -9` the Worker — the same signal the lab
+asks you to send from a second terminal, sent from a button. There is also a Python console scoped to
+the lab's directory.
+
+Code execution needs [agent-runtime](https://github.com/thinkinginmath/agent-runtime) running on your
+machine (`agent-runtime serve`, port 9477). It executes in a virtualenv per lab, and the page is
+served on port 3000, which the runtime already trusts, so there is no token to paste and no pairing
+prompt. Both ends are on loopback: nothing is exposed off your machine, and your browser's
+local-network rules never come into it.
+
+Without the runtime the pages are still the lab text, with copy buttons on every command. The
+terminal path in this README works exactly as written; the page is the same thing without a terminal.
+
 ## The labs
 
 | | Lab | What you break |

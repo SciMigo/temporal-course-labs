@@ -4,3 +4,4 @@
 .pytest_cache/
 .state/
 temporal-data/
+worker.out
