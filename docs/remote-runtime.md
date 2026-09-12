@@ -34,9 +34,8 @@ never disable pairing while it is up.
 # 1. runtime, with pairing ON (the default)
 agent-runtime serve --port 9477
 
-# 2. pair the course origin, then RESTART the runtime
-#    (the allowed-origin list is read once at startup)
-#    this prints a token; keep it
+# 2. pair the course origin: the page calls POST /pairing/request, you approve in this
+#    terminal, and the page receives an origin-bound token
 agent-runtime pairing list        # confirm https://scimigo.com is there afterwards
 
 # 3. a public https address for the runtime
@@ -51,11 +50,10 @@ When you are done: stop `cloudflared`, stop the runtime, and revoke the origin w
 
 ## Known rough edges, as of 2026-09
 
-- **Pairing is CLI-only.** There is no HTTP endpoint a page can call to request approval, so the
-  token has to be copied by hand.
-- **The allowed-origin list is read at startup.** Pair first, then start the runtime, or the browser
-  gets a CORS failure that looks like a bug.
 - **The tunnel URL changes every run,** so the paste step repeats each session.
+- Two earlier rough edges are fixed as of 2026-09-12: a browser can now call
+  `POST /pairing/request`, which prompts you in the runtime's terminal and returns an origin-bound
+  token, and the allowed-origin list is no longer frozen at startup.
 - Alternatively point the local page at the remote runtime with
   `python3 lab_server.py --runtime https://<your-tunnel>`. The page prints a warning and shows a
   banner when the runtime is not on your machine, which is the situation worth noticing.

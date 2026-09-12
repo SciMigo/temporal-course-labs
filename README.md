@@ -35,7 +35,7 @@ docker compose up -d                        # :7233, Web UI http://localhost:823
 
 # 2 — agent-runtime: executes the lab code, on your machine, in a venv per lab
 #     Needs Python 3.11+. macOS ships 3.9, so use a newer one (e.g. brew install python@3.12).
-git clone https://github.com/thinkinginmath/agent-runtime.git
+git clone https://github.com/SciMigo/agent-runtime.git
 cd agent-runtime && python3 -m venv .venv && ./.venv/bin/pip install -e .
 ./.venv/bin/python -m agent_runtime.cli serve --port 9477
 

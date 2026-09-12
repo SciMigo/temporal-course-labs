@@ -3,10 +3,10 @@
 
     python lab_server.py            # http://127.0.0.1:3000
 
-Why port 3000: agent-runtime (https://github.com/thinkinginmath/agent-runtime) treats
-http://localhost:3000 and http://127.0.0.1:3000 as already-paired origins, so the page can call
-the runtime on :9477 with no token and no pairing prompt. Both sides are on loopback, so the
-browser's local-network rules never come into it and nothing is exposed off your machine.
+Why a local page: agent-runtime (https://github.com/SciMigo/agent-runtime) trusts loopback
+origins on any port, so this page can call the runtime on :9477 with no token and no pairing
+prompt. Both sides are on loopback, so the browser's local-network rules never come into it and
+nothing is exposed off your machine. Port 3000 is just the default; --port anything works.
 
 Standard library only: no install step. The runtime and the Temporal dev server are both optional —
 without them the pages are still the lab text, and every exercise can be run from a terminal.
@@ -246,7 +246,7 @@ the code, running on your machine.</p>
 <pre><code>docker compose up -d          # Temporal dev server: :7233, Web UI :8233
 pip install -r requirements.txt</code></pre>
 <p class="hint">To run code from these pages, also start
-<a href="https://github.com/thinkinginmath/agent-runtime">agent-runtime</a>
+<a href="https://github.com/SciMigo/agent-runtime">agent-runtime</a>
 (<code>agent-runtime serve</code>). It executes on your machine, in a virtualenv per lab, and this page
 is served from port 3000 so the runtime already trusts it. Without it the pages are still the lab
 text, and every exercise works from a terminal.</p>
@@ -326,7 +326,7 @@ def console_panel(name: str, d: Path) -> str:
     return f"""<div class="panel">
 <h2>Run it here</h2>
 <p class="hint">These buttons execute on <strong>your</strong> machine, in this lab's virtualenv, through
-<a href="https://github.com/thinkinginmath/agent-runtime">agent-runtime</a> on :9477. The Worker runs as a
+<a href="https://github.com/SciMigo/agent-runtime">agent-runtime</a> on :9477. The Worker runs as a
 detached process, so the kill button sends the same <code>SIGKILL</code> the lab asks for from a second
 terminal. A terminal still works exactly as the text describes; this is the same thing without one.</p>
 <div class="btns" data-lab="{html.escape(name)}">
@@ -384,9 +384,8 @@ def main() -> None:
     if port_open(PORT):
         sys.exit(
             f"Port {PORT} is already in use.\n"
-            f"  Something else is on it (a dev server?). Stop that, or run with --port 3001.\n"
-            f"  Note: agent-runtime trusts http://localhost:3000 without pairing. On any other port\n"
-            f"  the page can still show the labs, but the Run buttons will need a pairing token."
+            f"  Something else is on it (a dev server?). Run with --port 3001 instead —\n"
+            f"  agent-runtime trusts any loopback origin, so the Run buttons work on any port."
         )
 
     rt, tp = runtime_up(), port_open(7233)
@@ -397,7 +396,7 @@ def main() -> None:
         print("\n  Start the Temporal dev server first:   docker compose up -d")
     if not rt:
         print("\n  The Run buttons need agent-runtime (it executes the code on this machine):")
-        print("      git clone https://github.com/thinkinginmath/agent-runtime.git")
+        print("      git clone https://github.com/SciMigo/agent-runtime.git")
         print("      cd agent-runtime && python3 -m venv .venv && ./.venv/bin/pip install -e .")
         print("      ./.venv/bin/python -m agent_runtime.cli serve --port 9477")
         print("  Without it the pages still show every lab, with copy buttons for the commands.")
@@ -405,8 +404,6 @@ def main() -> None:
         print("\n  WARNING: --runtime points off this machine (" + RUNTIME + ").")
         print("  Your code, and anything it can reach, goes to that host. Only do this with a")
         print("  tunnel you started yourself, with pairing on, and stop it when you are done.")
-    if PORT != 3000:
-        print(f"\n  Serving on {PORT}, not 3000: agent-runtime will ask this origin to pair before it runs code.")
     print("\nCtrl-C to stop.")
     try:
         ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
