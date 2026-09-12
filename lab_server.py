@@ -25,6 +25,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 RUNTIME = "http://127.0.0.1:9477"
 PORT = 3000
+BULLET = re.compile(r"^\s*[-*] ")
+NUMBER = re.compile(r"^\s*\d+\. ")
+
 LABS = sorted(p for p in ROOT.iterdir() if p.is_dir() and re.match(r"\d\d-", p.name))
 
 
@@ -72,20 +75,28 @@ def md_to_html(md: str, lab: str) -> str:
             while i < len(lines) and lines[i].startswith("|"):
                 rows.append(lines[i]); i += 1
             out.append(table(rows)); continue
-        elif re.match(r"^\s*[-*] ", line):
+        elif BULLET.match(line) or NUMBER.match(line):
+            tag = "ul" if BULLET.match(line) else "ol"
+            pat = BULLET if tag == "ul" else NUMBER
             items = []
-            while i < len(lines) and re.match(r"^\s*[-*] ", lines[i]):
-                items.append(f"<li>{inline(re.sub(r'^\\s*[-*] ', '', lines[i]))}</li>"); i += 1
-            out.append("<ul>" + "".join(items) + "</ul>"); continue
-        elif re.match(r"^\s*\d+\. ", line):
-            items = []
-            while i < len(lines) and re.match(r"^\s*\d+\. ", lines[i]):
-                items.append(f"<li>{inline(re.sub(r'^\\s*\\d+\\. ', '', lines[i]))}</li>"); i += 1
-            out.append("<ol>" + "".join(items) + "</ol>"); continue
+            while i < len(lines) and pat.match(lines[i]):
+                text = [pat.sub("", lines[i], count=1).strip()]
+                i += 1
+                # a wrapped continuation line belongs to the item above it
+                while (i < len(lines) and lines[i].strip() and not pat.match(lines[i])
+                       and not BULLET.match(lines[i]) and not NUMBER.match(lines[i])
+                       and not lines[i].lstrip().startswith(("```", "#", "|", ">"))):
+                    text.append(lines[i].strip()); i += 1
+                items.append(f"<li>{inline(' '.join(text))}</li>")
+            out.append(f"<{tag}>" + "".join(items) + f"</{tag}>"); continue
         elif line.startswith(">"):
             out.append(f"<blockquote>{inline(line.lstrip('> '))}</blockquote>")
         elif line.strip():
-            out.append(f"<p>{inline(line)}</p>")
+            para = []
+            while (i < len(lines) and lines[i].strip() and not lines[i].lstrip().startswith(("```", "#", "|", ">"))
+                   and not BULLET.match(lines[i]) and not NUMBER.match(lines[i])):
+                para.append(lines[i].strip()); i += 1
+            out.append(f"<p>{inline(' '.join(para))}</p>"); continue
         i += 1
     return "\n".join(out)
 
