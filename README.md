@@ -34,10 +34,13 @@ Everything below runs on your own machine. Three terminals once, then a browser.
 docker compose up -d                        # :7233, Web UI http://localhost:8233
 
 # 2 — agent-runtime: executes the lab code, on your machine, in a venv per lab
-#     Needs Python 3.11+. macOS ships 3.9, so use a newer one (e.g. brew install python@3.12).
-git clone https://github.com/SciMigo/agent-runtime.git
-cd agent-runtime && python3 -m venv .venv && ./.venv/bin/pip install -e .
-./.venv/bin/python -m agent_runtime.cli serve --port 9477
+#     Needs Python 3.11+ (macOS ships 3.9; brew install python@3.12).
+curl -fsSL https://raw.githubusercontent.com/SciMigo/agent-runtime/main/scripts/install-macos.sh | bash
+agent-runtime serve --port 9477
+#     or from a clone:
+#     git clone https://github.com/SciMigo/agent-runtime.git
+#     cd agent-runtime && python3 -m venv .venv && ./.venv/bin/pip install -e .
+#     ./.venv/bin/agent-runtime serve --port 9477
 
 # 3 — the lab pages (standard library only, nothing to install)
 python3 lab_server.py                       # http://127.0.0.1:3000

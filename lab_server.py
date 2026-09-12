@@ -396,9 +396,8 @@ def main() -> None:
         print("\n  Start the Temporal dev server first:   docker compose up -d")
     if not rt:
         print("\n  The Run buttons need agent-runtime (it executes the code on this machine):")
-        print("      git clone https://github.com/SciMigo/agent-runtime.git")
-        print("      cd agent-runtime && python3 -m venv .venv && ./.venv/bin/pip install -e .")
-        print("      ./.venv/bin/python -m agent_runtime.cli serve --port 9477")
+        print("      curl -fsSL https://raw.githubusercontent.com/SciMigo/agent-runtime/main/scripts/install-macos.sh | bash")
+        print("      agent-runtime serve --port 9477")
         print("  Without it the pages still show every lab, with copy buttons for the commands.")
     if not runtime_is_local():
         print("\n  WARNING: --runtime points off this machine (" + RUNTIME + ").")
