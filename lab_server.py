@@ -31,6 +31,13 @@ NUMBER = re.compile(r"^\s*\d+\. ")
 LABS = sorted(p for p in ROOT.iterdir() if p.is_dir() and re.match(r"\d\d-", p.name))
 
 
+def runtime_is_local() -> bool:
+    """True when the runtime URL points at this machine."""
+    from urllib.parse import urlparse
+    host = (urlparse(RUNTIME).hostname or "").lower()
+    return host in ("localhost", "127.0.0.1", "::1")
+
+
 def port_open(port: int) -> bool:
     with socket.socket() as s:
         s.settimeout(0.25)
@@ -145,6 +152,8 @@ button.run:disabled{{opacity:.5;cursor:default}}
   white-space:pre-wrap;font-family:ui-monospace,Menlo,monospace;font-size:.85em}}
 .out.err{{border-left-color:var(--bad)}}
 .hint{{color:var(--muted);font-size:.85rem}}
+.warn{{border:1px solid #b3261e;border-left-width:4px;border-radius:6px;padding:.5rem .8rem;margin:.5rem 0;
+  font-size:.88rem;background:rgba(179,38,30,.08)}}
 .panel{{border:1px solid var(--border);border-radius:8px;padding:.9rem 1rem;margin:1rem 0;background:var(--code)}}
 .panel h2{{margin-top:0}}.btns{{display:flex;gap:.5rem;flex-wrap:wrap}}
 button.primary{{border-color:var(--accent)}}
@@ -156,7 +165,7 @@ details{{margin-top:.8rem}}summary{{cursor:pointer;color:var(--accent);font-size
 </style>
 <div class="wrap">
 <nav><a href="/">All labs</a>{nav}
-<div class="status">
+{banner}<div class="status">
   <span><span class="dot {rt_cls}"></span>runtime :9477 {rt_txt}</span>
   <span><span class="dot {tp_cls}"></span>Temporal :7233 {tp_txt}</span>
   <span><a href="http://localhost:8233" target="_blank">Web UI</a></span>
@@ -213,7 +222,13 @@ document.addEventListener("click", async (e) => {{
 
 def shell(title: str, body: str, nav: str = "") -> bytes:
     rt, tp = runtime_up(), port_open(7233)
+    banner = "" if runtime_is_local() else (
+        '<div class="warn"><strong>Remote runtime.</strong> This page is sending your code to '
+        f'<code>{html.escape(RUNTIME)}</code>, not to your own machine. Anyone who learns that URL '
+        "and its token can run code on whatever host is behind it. Use a short-lived tunnel, and "
+        "stop it when you finish the lab.</div>")
     return PAGE.format(
+        banner=banner,
         title=html.escape(title), body=body, nav=nav, runtime=RUNTIME,
         rt_cls="up" if rt else "down", rt_txt="ready" if rt else "not running",
         tp_cls="up" if tp else "down", tp_txt="ready" if tp else "not running",
@@ -386,6 +401,10 @@ def main() -> None:
         print("      cd agent-runtime && python3 -m venv .venv && ./.venv/bin/pip install -e .")
         print("      ./.venv/bin/python -m agent_runtime.cli serve --port 9477")
         print("  Without it the pages still show every lab, with copy buttons for the commands.")
+    if not runtime_is_local():
+        print("\n  WARNING: --runtime points off this machine (" + RUNTIME + ").")
+        print("  Your code, and anything it can reach, goes to that host. Only do this with a")
+        print("  tunnel you started yourself, with pairing on, and stop it when you are done.")
     if PORT != 3000:
         print(f"\n  Serving on {PORT}, not 3000: agent-runtime will ask this origin to pair before it runs code.")
     print("\nCtrl-C to stop.")

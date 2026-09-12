@@ -89,6 +89,14 @@ Common helpers in `common/`: `connect()` reads `TEMPORAL_ADDRESS` (default `loca
 Requirements: Docker, Python 3.10+. Everything runs locally against the dev server; no Temporal
 Cloud account is needed or used.
 
+## Running the labs from the course site
+
+There is an advanced setup that puts the labs inside the course pages on scimigo.com instead of a
+separate tab. It needs a tunnel, because a public page cannot reach your machine, and that means
+briefly exposing your runtime to the internet behind a token. The trade-off, the recipe and the
+rough edges are in [docs/remote-runtime.md](docs/remote-runtime.md). The localhost setup above needs
+none of it.
+
 ## Recorded histories
 
 Some labs ship real Event Histories as fixtures (`histories/`, `tests/histories/`) so replay tests
