@@ -97,6 +97,24 @@ briefly exposing your runtime to the internet behind a token. The trade-off, the
 rough edges are in [docs/remote-runtime.md](docs/remote-runtime.md). The localhost setup above needs
 none of it.
 
+## Notebooks, for the labs that suit them
+
+Labs 2, 8, 9 and 10 also ship as notebooks (`lab-NN.ipynb` in each directory): they are mostly
+reading histories and running tests, which is what cells are good at.
+
+```bash
+pip install jupyterlab && jupyter lab      # then open the lab's .ipynb
+```
+
+The other seven labs stay terminal-first on purpose. They run Workers across two to five terminals
+and ask you to kill them mid-flight; a single kernel is the wrong shape for that, and pretending
+otherwise would hide the lesson. Where a notebook cell would have started something long-lived, the
+notebook says so and leaves the command for a terminal.
+
+The `README.md` in each lab is the source of truth. The notebooks are generated from it with
+[jupytext](https://jupytext.readthedocs.io) — `python3 tools/make_notebooks.py` — so the two cannot
+drift.
+
 ## Recorded histories
 
 Some labs ship real Event Histories as fixtures (`histories/`, `tests/histories/`) so replay tests
