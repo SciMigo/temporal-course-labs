@@ -1,0 +1,18 @@
+# Temporal dev server for the labs. Free, local, disposable.
+#   docker compose up -d        → gRPC on localhost:7233, Web UI on http://localhost:8233
+#   docker compose down         → history survives in the named volume `temporal-data`
+#   docker compose down -v      → wipe history
+# The volume mounts at the unprivileged user's own home so it can write the SQLite file.
+# A root-owned mount (a bind mount, or a volume at a path the image lacks) dies with
+# "unable to open database file: out of memory (14)".
+services:
+  temporal:
+    image: temporalio/temporal:latest
+    command: ["server", "start-dev", "--ip", "0.0.0.0", "--db-filename", "/home/temporal/temporal.db"]
+    ports:
+      - "7233:7233"
+      - "8233:8233"
+    volumes:
+      - temporal-data:/home/temporal
+volumes:
+  temporal-data:
