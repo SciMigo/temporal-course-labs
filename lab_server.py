@@ -351,8 +351,49 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
-if __name__ == "__main__":
+def main() -> None:
+    global PORT, RUNTIME
+    import argparse
+    import sys
+
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--port", type=int, default=PORT,
+                    help="port to serve on (default 3000; see the note about pairing below)")
+    ap.add_argument("--runtime", default=RUNTIME, help=f"agent-runtime base URL (default {RUNTIME})")
+    args = ap.parse_args()
+    PORT, RUNTIME = args.port, args.runtime.rstrip("/")
+
+    if sys.version_info < (3, 9):
+        sys.exit(f"This needs Python 3.9+; you are on {sys.version.split()[0]}.")
+
+    if port_open(PORT):
+        sys.exit(
+            f"Port {PORT} is already in use.\n"
+            f"  Something else is on it (a dev server?). Stop that, or run with --port 3001.\n"
+            f"  Note: agent-runtime trusts http://localhost:3000 without pairing. On any other port\n"
+            f"  the page can still show the labs, but the Run buttons will need a pairing token."
+        )
+
+    rt, tp = runtime_up(), port_open(7233)
     print(f"labs      http://127.0.0.1:{PORT}")
-    print(f"runtime   {RUNTIME}  ({'ready' if runtime_up() else 'not running — start agent-runtime serve'})")
-    print(f"temporal  127.0.0.1:7233  ({'ready' if port_open(7233) else 'not running — docker compose up -d'})")
-    ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
+    print(f"runtime   {RUNTIME}  ({'ready' if rt else 'not running'})")
+    print(f"temporal  127.0.0.1:7233  ({'ready' if tp else 'not running'})")
+    if not tp:
+        print("\n  Start the Temporal dev server first:   docker compose up -d")
+    if not rt:
+        print("\n  The Run buttons need agent-runtime (it executes the code on this machine):")
+        print("      git clone https://github.com/thinkinginmath/agent-runtime.git")
+        print("      cd agent-runtime && python3 -m venv .venv && ./.venv/bin/pip install -e .")
+        print("      ./.venv/bin/python -m agent_runtime.cli serve --port 9477")
+        print("  Without it the pages still show every lab, with copy buttons for the commands.")
+    if PORT != 3000:
+        print(f"\n  Serving on {PORT}, not 3000: agent-runtime will ask this origin to pair before it runs code.")
+    print("\nCtrl-C to stop.")
+    try:
+        ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
+    except KeyboardInterrupt:
+        print("\nstopped")
+
+
+if __name__ == "__main__":
+    main()
