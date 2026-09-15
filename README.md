@@ -25,6 +25,105 @@ python starter.py                          # terminal 2
 The Worker runs on your machine, not in the container, so you can `kill -9` it from a second
 terminal while watching the Web UI. That action is the day-one lesson.
 
+## On a MacBook, start to finish
+
+Two names collide in this course, so separate them first. **`AgentRun`** is the Workflow *you
+build* — the program these eleven labs grow. **`agent-runtime`** is a separate, optional kernel that
+lets a browser page run lab code on your machine; it belongs to the next section and nothing here
+uses it.
+
+The browser you *do* need is the Temporal **Web UI on :8233**. Reading event history is most of what
+these labs ask of you.
+
+### Prerequisites
+
+- **Docker Desktop, running.** `docker compose up -d` needs the daemon, and the whale has to be
+  started once after a reboot.
+- **Python 3.10 or newer.** `temporalio` requires >= 3.10 and macOS ships 3.9 as `python3`. Check
+  with `python3 -V`; if it says 3.9, `brew install python@3.12` and use `python3.12` below. This
+  matters more than it looks: on 3.9, `pip install "temporalio>=1.9"` quietly resolves to an older
+  SDK than the one every recorded output in these labs came from.
+
+### The first run
+
+```bash
+git clone https://github.com/SciMigo/temporal-course-labs.git
+cd temporal-course-labs
+
+docker compose up -d                       # dev server: gRPC :7233, Web UI :8233
+open http://localhost:8233                 # leave this tab open for the whole course
+
+python3.12 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+
+export TASK_QUEUE=lab-01                   # in EVERY terminal for this lab
+cd 01-the-machine
+python worker.py                           # terminal 1 — it prints its own pid
+```
+
+Second terminal:
+
+```bash
+cd temporal-course-labs && source .venv/bin/activate
+export TASK_QUEUE=lab-01                   # again: a Worker and a Client on different queues
+cd 01-the-machine                          # wait for each other forever, with no error anywhere
+python starter.py
+```
+
+`starter.py` waits for the result, then prints the history. With nothing killed it ends at **event
+16** — `WORKFLOW_EXECUTION_COMPLETED`, about thirty seconds after `TIMER_STARTED`.
+
+### The experiment, and the one bit of timing that matters
+
+The lesson is not that a Workflow survives a restart. It is *where the program lives while no
+process is running it*. So kill the Worker and then **leave it dead**.
+
+1. Start a run and let it reach the timer. Terminal 1 printed
+   `worker pid=NNNNN polling 'lab-01'; kill -9 NNNNN to crash it` — use that pid.
+2. `kill -9 NNNNN` from a **third** terminal. Terminal 2 is blocked inside `starter.py`, waiting on
+   the Workflow result, and you want it to stay that way: it survives the whole outage and prints
+   the finished history itself at the end. Not Ctrl-C on the Worker — that lets it shut down
+   politely, and you want a crash.
+3. **Wait at least 45 seconds before restarting anything.** The timer is 30 s and the sticky
+   schedule-to-start timeout is a further 10 s. Restart too early and events 14 and 15 never appear,
+   and they are the point.
+4. Read the history with no Worker alive anywhere. Four events were written while your machine ran
+   nothing of yours:
+
+```text
+12  TIMER_FIRED              the Service's clock, not your process
+13  WORKFLOW_TASK_SCHEDULED  offered on the dead Worker's sticky queue
+14  WORKFLOW_TASK_TIMED_OUT  sticky schedule-to-start expired
+15  WORKFLOW_TASK_SCHEDULED  reoffered on the shared queue — and it waits here
+```
+
+5. Now `python worker.py` again. The run finishes, and the identity on event 16 is a **different
+   pid** from the one you killed:
+
+```text
+16  WORKFLOW_TASK_STARTED    <new pid>@<your-mac>
+17  WORKFLOW_TASK_COMPLETED
+18  WORKFLOW_EXECUTION_COMPLETED
+```
+
+That is `starter.py` in terminal 2 finally returning: it waited out the crash, the dead thirty
+seconds and the restart, and printed a result computed by a process that no longer exists.
+
+Sixteen events without the kill, eighteen with it, and a different pid on the last three. If you got
+those numbers, the lab worked.
+
+### When it does not
+
+| Symptom | Cause |
+|---|---|
+| `starter.py` hangs, no error anywhere | `TASK_QUEUE` differs between your two terminals. Temporal creates a queue on first use and cannot know you meant another one. |
+| `Cannot connect to the Docker daemon` | Docker Desktop is not running. |
+| `pip` installs a `temporalio` older than 1.32 | You are on macOS's stock Python 3.9. See prerequisites. |
+| History stops at 13 | You restarted the Worker too quickly. |
+| You scripted the kill and your shell died | `pkill -f worker.py` matches your own shell's command line too. Use the pid the Worker printed. |
+
+`docker compose down -v` wipes all history and hands you a clean dev server.
+
 ## Or run them from a local page, without a terminal
 
 Everything below runs on your own machine. Three terminals once, then a browser.
