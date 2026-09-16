@@ -125,39 +125,60 @@ those numbers, the lab worked.
 
 `docker compose down -v` wipes all history and hands you a clean dev server.
 
-## Or run them from a local page, without a terminal
+## Or run them from a local page
 
-Everything below runs on your own machine. Three terminals once, then a browser.
+Everything below runs on your own machine. After setup in three terminals, use the browser buttons
+for each lab. Run commands in separate terminals as labeled.
+
+**Terminal 1 — Temporal dev server** (needs Docker Desktop on macOS):
 
 ```bash
-# 1 — Temporal dev server (needs Docker Desktop on macOS)
-docker compose up -d                        # :7233, Web UI http://localhost:8233
-
-# 2 — agent-runtime: executes the lab code, on your machine, in a venv per lab
-#     Needs Python 3.11+ (macOS ships 3.9; brew install python@3.12).
-curl -fsSL https://raw.githubusercontent.com/SciMigo/agent-runtime/main/scripts/install-macos.sh | bash
-agent-runtime serve --port 9477
-#     or from a clone:
-#     git clone https://github.com/SciMigo/agent-runtime.git
-#     cd agent-runtime && python3 -m venv .venv && ./.venv/bin/pip install -e .
-#     ./.venv/bin/agent-runtime serve --port 9477
-
-# 3 — the lab pages (standard library only, nothing to install)
-python3 lab_server.py                       # http://127.0.0.1:3000
+docker compose up -d
 ```
 
-Then open **http://localhost:3000**. The strip at the top of every page shows whether the runtime
-and Temporal are up, so you can tell at a glance what is missing.
+**Terminal 2 — agent-runtime** (Python 3.11+). On macOS, install it first:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/SciMigo/agent-runtime/main/scripts/install-macos.sh | bash
+```
+
+Wait for `Installed Agent Runtime` before starting it. A GitHub archive timeout means installation
+failed; retry when GitHub is reachable or use the clone fallback below. An older installation may
+still start after a failed upgrade.
+
+```bash
+agent-runtime serve --port 9477
+```
+
+On Linux, or as a clone fallback on macOS, run in a separate directory:
+
+```bash
+git clone https://github.com/SciMigo/agent-runtime.git
+cd agent-runtime
+python3 -m venv .venv
+./.venv/bin/pip install -e .
+./.venv/bin/agent-runtime serve --port 9477
+```
+
+**Terminal 3 — lab pages.** Open a terminal in `temporal-course-labs`. The server uses only Python's
+standard library:
+
+```bash
+python3 lab_server.py
+```
+
+Then open **http://127.0.0.1:3000/** (HTTP, not HTTPS), exactly as printed by the server. If your
+browser adds `/en`, the lab server accepts that path too. The strip at the top of every page shows
+whether the runtime and Temporal are up.
 
 Each lab gets a page with the exercise text and a **Run it here** panel: prepare this lab's
 virtualenv, start the Worker, run `starter.py`, and `kill -9` the Worker — the same signal the lab
 asks you to send from a second terminal, sent from a button. There is also a Python console scoped to
 the lab's directory.
 
-The page is served on port 3000 because the runtime already trusts that origin: no token to paste,
-no pairing prompt. Both ends are on loopback, so nothing is exposed off your machine and your
-browser's local-network rules never come into it. On any other port the pages still work, but the
-runtime will want the origin paired first.
+The runtime trusts loopback origins on any port: no token to paste and no pairing prompt. Both ends
+are on loopback, so nothing is exposed off your machine. If port 3000 is in use, run
+`python3 lab_server.py --port 3001` and open `http://127.0.0.1:3001/`.
 
 Without the runtime the pages are still the lab text, with copy buttons on every command. The
 terminal path in this README works exactly as written; the page is the same thing without a terminal.

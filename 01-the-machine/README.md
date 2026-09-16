@@ -9,6 +9,9 @@ look at the result, repeat) whose parts have fixed names — `plan()` decides in
 same file. Reading page: "The program this course builds".
 
 ## 1.1 Bring it up
+On the local lab page (Option A), use the **Run it here** buttons above for steps 1–3, then continue
+at step 4. The commands in steps 1–3 are for the terminal path (Option B).
+
 1. `docker compose up -d` in `labs/`; open http://localhost:8233.
 2. `export TASK_QUEUE=lab-01` in **every** terminal you open for this lab. The Worker polls that
    queue and the Client starts the Workflow on it; name them differently and the Workflow is created

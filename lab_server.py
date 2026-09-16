@@ -242,14 +242,11 @@ def index() -> bytes:
 <p>Eleven labs, one program. The reading for each module is on
 <a href="https://scimigo.com/learn/temporal-durable-execution">the course site</a>; this server is
 the code, running on your machine.</p>
-<h2>Before you start</h2>
-<pre><code>docker compose up -d          # Temporal dev server: :7233, Web UI :8233
-pip install -r requirements.txt</code></pre>
-<p class="hint">To run code from these pages, also start
-<a href="https://github.com/SciMigo/agent-runtime">agent-runtime</a>
-(<code>agent-runtime serve</code>). It executes on your machine, in a virtualenv per lab, and this page
-is served from port 3000 so the runtime already trusts it. Without it the pages are still the lab
-text, and every exercise works from a terminal.</p>
+<p>If you followed Option A on the course page, your three terminals are already set up. Check that
+runtime and Temporal say <strong>ready</strong> above, then open Lab 1. Its <strong>Prepare this lab</strong>
+button installs the Python packages and sets the Task Queue for that lab.</p>
+<p class="hint">If either service says <strong>not running</strong>, return to the course setup and
+start it before using the lab buttons.</p>
 <h2>Labs</h2><ol>{rows}</ol>"""
     return shell("Temporal labs", body)
 
@@ -325,10 +322,10 @@ def console_panel(name: str, d: Path) -> str:
         return f'<button class="{cls}" data-inline="{html.escape(code)}">{label}</button>'
     return f"""<div class="panel">
 <h2>Run it here</h2>
-<p class="hint">These buttons execute on <strong>your</strong> machine, in this lab's virtualenv, through
-<a href="https://github.com/SciMigo/agent-runtime">agent-runtime</a> on :9477. The Worker runs as a
-detached process, so the kill button sends the same <code>SIGKILL</code> the lab asks for from a second
-terminal. A terminal still works exactly as the text describes; this is the same thing without one.</p>
+<p class="hint">With Option A already set up, use these buttons for this lab. <strong>Prepare this
+lab</strong> installs its Python packages and sets its Task Queue; then start the Worker and run the
+starter. The kill button sends <code>SIGKILL</code> to the Worker. Terminal commands in the exercise
+below describe Option B.</p>
 <div class="btns" data-lab="{html.escape(name)}">
   {b("1 · Prepare this lab", prepare, True)}
   {b("2 · Start Worker", worker)}
@@ -347,7 +344,7 @@ terminal. A terminal still works exactly as the text describes; this is the same
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
-        if self.path == "/":
+        if self.path in ("/", "/en", "/en/"):
             return self.send(index())
         m = re.match(r"^/lab/([0-9]{2}-[a-z0-9-]+)/?$", self.path)
         if m:
