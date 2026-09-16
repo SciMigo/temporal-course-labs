@@ -4,9 +4,9 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from common import connect  # noqa: E402
+from common import TASK_QUEUE, connect  # noqa: E402
 from temporalio.worker import Worker  # noqa: E402
-from workflows import TASK_QUEUE, AgentRun, call_llm  # noqa: E402
+from workflows import AgentRun, call_llm  # noqa: E402
 
 # Show the Workflow's "live:" lines and the Activity's invocation counter.
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")

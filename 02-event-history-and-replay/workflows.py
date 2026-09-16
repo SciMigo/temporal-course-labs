@@ -19,7 +19,6 @@ from datetime import timedelta
 
 from temporalio import activity, workflow
 
-TASK_QUEUE = os.environ.get("TASK_QUEUE", "agent-runs")
 
 # Lives in the Worker process, outside the Workflow sandbox: a plain global.
 CALL_LLM_INVOCATIONS = 0

@@ -3,8 +3,8 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from common import connect, show_history  # noqa: E402
-from workflows import TASK_QUEUE, AgentRun  # noqa: E402
+from common import TASK_QUEUE, connect, show_history  # noqa: E402
+from workflows import AgentRun  # noqa: E402
 
 # Override when several people share one dev server: WORKFLOW_ID=lab08-agent-42 python starter.py
 WORKFLOW_ID = os.environ.get("WORKFLOW_ID", "agent-42")

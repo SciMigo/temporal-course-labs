@@ -13,7 +13,8 @@ same file. Reading page: "The program this course builds".
 2. `export TASK_QUEUE=lab-01` in **every** terminal you open for this lab. The Worker polls that
    queue and the Client starts the Workflow on it; name them differently and the Workflow is created
    and then waits forever, with no error anywhere — Temporal creates Task Queues on first use and
-   cannot know you meant a different one.
+   cannot know you meant a different one. Both scripts print the queue they use: if the name in the
+   Worker's first line differs from the one in `started agent-42 on ...`, that is your hang.
 3. Terminal 1: `python worker.py`. Terminal 2: `python starter.py`.
 4. In the UI, find `agent-42`. Read the events: `ActivityTaskScheduled  call_llm`, then `TimerStarted`.
    Write down every event id so far, the pending timer, and the Worker identity on the Workflow Tasks.
@@ -37,13 +38,22 @@ lives while no process is running it. So do not restart anything yet.
 ```
 
 4. Note what did *not* happen: the Workflow did not fail, did not roll back, and did not finish. It
-   is Running, with a Workflow Task scheduled and nobody to take it.
+   is Running, with a Workflow Task scheduled and nobody to take it. The timer has already fired, so
+   the execution is no longer waiting for time. It is waiting for compute.
 5. Now `python worker.py` again. The new Worker takes that waiting task, replays, and the Workflow
    completes: `WorkflowTaskStarted`, `WorkflowTaskCompleted`, `WorkflowExecutionCompleted`. Note the
    identity on the last Workflow Task — a different process from the one you killed.
+6. Count the `call_llm key=...` log lines across both Worker terminals (the killed Worker's output is
+   still on screen; on the local lab page, **Worker output** shows both). There is exactly one, and it
+   came from the Worker you killed. Yet the new Worker finished `AgentRun`, and `starter.py` printed
+   the model's answer as the result. The new process never called the model, and it ran
+   `self.context_summary = answer` all the same. Where did `answer` come from?
 
 Which events prove the Service was making progress while your application compute was absent? (12
-and 13, and 14–15 after them.) Module 2 annotates this same history event by event.
+and 13, and 14–15 after them.) And the answer to step 6 is event 7, `ActivityTaskCompleted`: the new
+Worker ran `AgentRun.run` from the top, and when it reached the `await` on `call_llm`, the SDK handed
+back the result recorded in event 7 instead of scheduling the Activity again. Workflow code re-runs;
+completed Activities do not. Module 2 annotates this same history event by event.
 
 ## 1.3 Who does what
 Fill this in from what you just watched, before reading module 1's answer.
@@ -66,16 +76,26 @@ First, pick one:
   Events to reconstruct the state.
 - **D.** `starter.py` held the state — it was still running.
 
-Then write one paragraph in your own words. Do not say "Temporal saved the stack." Compare with
-module 2 afterwards, and keep the paragraph: module 2 makes it precise.
+Then write one paragraph in your own words. Do not say "Temporal saved the stack." Compare it with
+the answer at the end of module 1's reading ("Where was the program counter stored?"), and keep your
+paragraph: module 2 makes it precise.
 
 ## 1.5 Stretch: two Workers
 **Predict first, in writing:** once a Worker has run a Workflow Task for `agent-42`, is that
 execution bound to that process?
 
-Then start two Workers before running the starter, kill whichever one picks up the first Workflow
-Task, and watch. Affinity to one Worker (module 2 names it *sticky execution*) is a caching
-optimization; it is not what makes the Workflow durable.
+Then start two Workers before running the starter. While the timer is pending, `kill -9` whichever
+one ran the Workflow Tasks so far (its pid is the Worker identity on events 3 and 9), and watch. Note
+the time between `TimerFired` and the surviving Worker's `WorkflowTaskStarted`, and compare it with
+events 13–15 in 1.2.
+
+What we measured on the labs' dev server (Temporal Server 1.31.2, 2026-09): the surviving Worker
+took the Task about 0.02 s after `TimerFired` in 3 runs of 3, with no `WorkflowTaskTimedOut`, and the
+same happened when the second Worker was started 12 s *after* the kill. The 10 s pause in 1.2 showed
+up only when no Worker at all was polling as the timer fired. A Worker caches the state of the
+Workflows it runs, and the Service prefers to send their next Task back to it; module 2 names this
+*sticky execution*. It is a caching optimization, not what makes the Workflow durable: the Worker
+that takes over has no cache, and it rebuilds the state by replay.
 
 ## Done when
 You can answer all four without looking anything up:

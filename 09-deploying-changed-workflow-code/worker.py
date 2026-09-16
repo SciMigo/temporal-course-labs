@@ -11,12 +11,11 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from common import connect  # noqa: E402
+from common import TASK_QUEUE, connect  # noqa: E402
 from temporalio.common import VersioningBehavior  # noqa: E402
 from temporalio.worker import Worker, WorkerDeploymentConfig, WorkerDeploymentVersion  # noqa: E402
 
 from code_versions import load  # noqa: E402
-from workflows import TASK_QUEUE  # noqa: E402
 
 DEPLOYMENT_NAME = os.environ.get("DEPLOYMENT_NAME", "agent-runs")
 BUILD_ID = os.environ.get("BUILD_ID")               # unset -> an unversioned Worker
