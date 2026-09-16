@@ -40,9 +40,10 @@ these labs ask of you.
 - **Docker Desktop, running.** `docker compose up -d` needs the daemon, and the whale has to be
   started once after a reboot.
 - **Python 3.10 or newer.** `temporalio` requires >= 3.10 and macOS ships 3.9 as `python3`. Check
-  with `python3 -V`; if it says 3.9, `brew install python@3.12` and use `python3.12` below. This
-  matters more than it looks: on 3.9, `pip install "temporalio>=1.9"` quietly resolves to an older
-  SDK than the one every recorded output in these labs came from.
+  with `python3 -V`; if it says 3.9, `brew install python@3.12` and use `python3.12` below.
+  `requirements.txt` pins `temporalio==1.32.0`, the SDK every recorded output in these labs came
+  from, and 1.32.0 requires Python 3.10, so on 3.9 `pip install` stops with
+  `No matching distribution found for temporalio==1.32.0`.
 
 ### The first run
 
@@ -118,7 +119,7 @@ those numbers, the lab worked.
 |---|---|
 | `starter.py` hangs, no error anywhere | `TASK_QUEUE` differs between your two terminals. Temporal creates a queue on first use and cannot know you meant another one. |
 | `Cannot connect to the Docker daemon` | Docker Desktop is not running. |
-| `pip` installs a `temporalio` older than 1.32 | You are on macOS's stock Python 3.9. See prerequisites. |
+| `pip`: `No matching distribution found for temporalio==1.32.0` | You are on macOS's stock Python 3.9. See prerequisites. |
 | History stops at 13 | You restarted the Worker too quickly. |
 | You scripted the kill and your shell died | `pkill -f worker.py` matches your own shell's command line too. Use the pid the Worker printed. |
 

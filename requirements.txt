@@ -1,4 +1,4 @@
-temporalio>=1.9
+temporalio==1.32.0
 pytest
 pytest-asyncio
 fastapi>=0.110
