@@ -1,8 +1,14 @@
 """Lab 1: AgentRun, stage 1 — plan one step, call the model once, sleep, finish.
 
 This is the program the whole course grows. Nothing here is Temporal-magic: an
-Activity is a function with a recorded outcome; a Workflow is code whose
-decisions Temporal persists so a fresh Worker can reconstruct them.
+Activity performs external work, and its outcome becomes part of the Event
+History; a Workflow is deterministic code whose Commands, and the results that
+came back for them, are recorded, so a fresh Worker can rebuild its state by
+replaying them. Temporal never stores `self.step`; it stores enough history to
+recompute it.
+
+The Task Queue name is deployment configuration, not Workflow logic, so it lives
+in common/ and only worker.py and starter.py read it.
 """
 from __future__ import annotations
 
@@ -12,9 +18,6 @@ from dataclasses import dataclass
 from datetime import timedelta
 
 from temporalio import activity, workflow
-
-import os
-TASK_QUEUE = os.environ.get("TASK_QUEUE", "agent-runs")
 
 
 @dataclass

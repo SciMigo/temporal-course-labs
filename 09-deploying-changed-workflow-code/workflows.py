@@ -29,7 +29,6 @@ from temporalio.common import RetryPolicy
 from temporalio.workflow import ContinueAsNewVersioningBehavior
 from temporalio.exceptions import ActivityError, ApplicationError, CancelledError
 
-TASK_QUEUE = os.environ.get("TASK_QUEUE", "agent-runs")
 BUILD_ID = "v1"                                 # what this file is, for log lines
 # Lab knob: continue-as-new after this many steps per run (0 = only when the Service suggests it).
 STEPS_PER_RUN = int(os.environ.get("AGENTRUN_STEPS_PER_RUN", "0"))

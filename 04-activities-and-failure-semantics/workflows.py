@@ -28,7 +28,8 @@ from temporalio import activity, workflow
 from temporalio.common import RetryPolicy
 from temporalio.exceptions import ActivityError, ApplicationError
 
-TASK_QUEUE = os.environ.get("TASK_QUEUE", "agent-runs")
+from common import TASK_QUEUE  # the NOBODY queue further down is named after it
+
 STATE_DIR = os.environ.get("LAB04_STATE_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), ".state"))
 IDEMPOTENT = os.environ.get("LAB04_IDEMPOTENT", "") == "1"
 

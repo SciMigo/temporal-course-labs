@@ -11,9 +11,9 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from common import connect, show_history  # noqa: E402
+from common import TASK_QUEUE, connect, show_history  # noqa: E402
 from temporalio.common import AutoUpgradeVersioningOverride  # noqa: E402
-from workflows import TASK_QUEUE, AgentRun  # noqa: E402
+from workflows import AgentRun  # noqa: E402
 
 from routing import describe_versioning  # noqa: E402
 

@@ -14,11 +14,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from common import connect  # noqa: E402
+from common import TASK_QUEUE, connect  # noqa: E402
 from temporalio import activity  # noqa: E402
 from temporalio.exceptions import ApplicationError  # noqa: E402
 from temporalio.worker import Worker  # noqa: E402
-from workflows import TASK_QUEUE, AgentRun, ToolCall, ToolResult, call_llm  # noqa: E402
+from workflows import AgentRun, ToolCall, ToolResult, call_llm  # noqa: E402
 
 WORKFLOW_ID = os.environ.get("WORKFLOW_ID", "agent-42-broken")
 OUT = Path(__file__).resolve().parent.parent / "tests" / "histories" / f"forensic_{WORKFLOW_ID}.json"

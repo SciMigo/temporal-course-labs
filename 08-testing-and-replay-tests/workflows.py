@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
-import os
 from dataclasses import dataclass, field
 from datetime import timedelta
 
@@ -23,7 +22,6 @@ from temporalio import activity, workflow
 from temporalio.common import RetryPolicy
 from temporalio.exceptions import ActivityError, ApplicationError, CancelledError
 
-TASK_QUEUE = os.environ.get("TASK_QUEUE", "agent-runs")
 
 # The agent parks here when paused and waits for a human. Three days, not three seconds:
 # the time-skipping test environment is what makes this testable.

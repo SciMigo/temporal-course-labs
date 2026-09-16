@@ -30,7 +30,6 @@ from datetime import datetime, timedelta, timezone
 
 from temporalio import activity, workflow
 
-TASK_QUEUE = os.environ.get("TASK_QUEUE", "agent-runs")
 BREAK = os.environ.get("LAB03_BREAK", "none")
 # Set in 3.3 only. Empty => call_llm fakes the model (one step, then finish).
 MODEL_URL = os.environ.get("LAB03_MODEL_URL", "")
