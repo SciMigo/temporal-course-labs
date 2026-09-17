@@ -58,8 +58,8 @@ def action(key: str, title: str, args: list[str], detail: str, kind: str = "comm
 # exercise without pretending that a single default Worker or starter fits all eleven labs.
 LAB_ACTIONS: dict[str, list[dict[str, object]]] = {
     "01": [
-        action("worker", "Worker", ["worker.py"], "Polls lab-01; crash it during the timer.", "worker"),
-        action("starter", "Start agent-42", ["starter.py"], "Starts the run and waits in the background for its result."),
+        action("worker", "Worker", ["worker.py"], "Polls lab-01; crash it during the timer, then run this Worker again to resume.", "worker"),
+        action("starter", "Start agent-42", ["starter.py"], "Start this Workflow once. After a Worker crash, run the Worker again instead."),
     ],
     "02": [
         action("worker", "Worker 1", ["worker.py"], "The first Worker for history and replay.", "worker"),
@@ -308,8 +308,8 @@ def lab_page(name: str) -> bytes | None:
         start = lab_text.index("## 1.1 Bring it up")
         end = lab_text.index("## 1.2 Kill the Worker", start)
         lab_text = (lab_text[:start] + """## 1.1 Bring it up
-Your setup services are already running. Click **Prepare this lab**, then **Run** on the Worker and
-Start agent-42 cards above. The starter keeps running in the background while you do the crash
+Your setup services are already running. Click **Prepare this lab**, then **Run Worker** and
+**Start Workflow** on the cards above. The starter keeps running in the background while you do the crash
 experiment; its Output button shows progress and the eventual result.
 You do not need to change directories or run Python commands in a terminal for Option A.
 
@@ -368,7 +368,9 @@ def console_panel(name: str, d: Path) -> str:
         env = dict(item["env"])
         command = "python " + " ".join(args)
         kind = "Worker" if item["kind"] == "worker" else "Command"
-        launch = button("Run", code(f"start({key!r}, {title!r}, {args!r}, {env!r})"), "launch")
+        launch_label = ("Run Worker" if name[:2] == "01" and key == "worker" else
+                        "Start Workflow" if name[:2] == "01" and key == "starter" else "Run")
+        launch = button(launch_label, code(f"start({key!r}, {title!r}, {args!r}, {env!r})"), "launch")
         output = button("Output", code(f"output({key!r})"), "view-output")
         method = "kill" if kind == "Worker" else "stop"
         stop = button("Crash Worker" if kind == "Worker" else "Stop", code(f"{method}({key!r})"), "danger")

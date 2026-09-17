@@ -22,8 +22,8 @@ look at the result, repeat) whose parts have fixed names — `plan()` decides in
 same file. Reading page: "The program this course builds".
 
 ## 1.1 Bring it up
-**Option A — local page:** Click **Prepare this lab**, then **Run** on the Worker and Start agent-42
-cards above. The page installs the lab's packages, sets `TASK_QUEUE=lab-01`, and uses the right
+**Option A — local page:** Click **Prepare this lab**, then **Run Worker** and **Start Workflow**
+on the cards above. The page installs the lab's packages, sets `TASK_QUEUE=lab-01`, and uses the right
 working directory. The starter runs in the background while you do the crash experiment; click
 **Output** on its card to see progress and the eventual result. Do not run the terminal commands below.
 
@@ -76,10 +76,11 @@ lives while no process is running it. So do not restart anything yet.
 4. Note what did *not* happen: the Workflow did not fail, did not roll back, and did not finish. It
    is Running, with a Workflow Task scheduled and nobody to take it. The timer has already fired, so
    the execution is no longer waiting for time. It is waiting for compute.
-5. Now click **Run** on the Worker card again (Option A), or run `../.venv/bin/python worker.py` in the Lab 1
+5. Now click **Run Worker** on the Worker card again (Option A), or run `../.venv/bin/python worker.py` in the Lab 1
    directory (Option B). The new Worker takes that waiting task, replays, and the Workflow
    completes: `WorkflowTaskStarted`, `WorkflowTaskCompleted`, `WorkflowExecutionCompleted`. Note the
-   identity on the last Workflow Task — a different process from the one you killed.
+   identity on the last Workflow Task — a different process from the one you killed. **Do not click
+   Start Workflow again:** `agent-42` is the existing run that the new Worker will finish.
 6. Count the `call_llm key=...` log lines across both Worker terminals (the killed Worker's output is
    still on screen; on the local lab page, the Worker's **Output** shows both). There is exactly one, and it
    came from the Worker you killed. Yet the new Worker finished `AgentRun`, and `starter.py` printed
