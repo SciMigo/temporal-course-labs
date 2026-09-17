@@ -306,6 +306,11 @@ timer, and the Worker identity on the Workflow Tasks.
     if match:
         objective = '<section class="objective-card" aria-labelledby="objective-heading"><h2 id="objective-heading">Objective</h2>' + md_to_html(match.group(1).strip(), name) + '</section>'
         exercise = exercise[:match.start()] + exercise[match.end():]
+    before = ""
+    match = re.search(r"(?m)^## Before you run\n\n(?:- [^\n]+\n)+\n?", exercise)
+    if match:
+        before = '<section class="before-card" aria-labelledby="before-heading"><h2 id="before-heading">Before you run</h2>' + md_to_html(match.group()[len('## Before you run'):].strip(), name) + '</section>'
+        exercise = exercise[:match.start()] + exercise[match.end():]
     reading = md_to_html(exercise, name)
     reading += ('<h2>Files in this lab</h2><ul>'
              + "".join(f"<li><code>{html.escape(f)}</code></li>" for f in files) + "</ul>")
@@ -313,7 +318,7 @@ timer, and the Worker identity on the Workflow Tasks.
                   for line in exercise.splitlines() if line.startswith('## '))
     hero = (f'<section class="hero"><span class="eyebrow">LAB {name[:2]} / 11</span>'
             f'<h1>{html.escape(title)}</h1><p>{html.escape(goal)}</p></section>')
-    body = (hero + objective + console_panel(name, d) + '<div class="reading-layout" id="exercise">'
+    body = (hero + objective + before + console_panel(name, d) + '<div class="reading-layout" id="exercise">'
             f'<aside class="toc"><h2>On this page</h2>{toc}</aside>'
             f'<article class="lab-reading">{reading}</article></div>')
     idx = [p.name for p in LABS].index(name)

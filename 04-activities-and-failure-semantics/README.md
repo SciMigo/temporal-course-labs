@@ -11,6 +11,13 @@ for each number.
 
 **By the end:** Identify four timeout events, resume work from a heartbeat, and use a stable key to prevent a duplicate effect.
 
+## Before you run
+
+- **Mechanism:** An Activity performs effects outside Workflow code and may run more than once. Timeouts bound different phases; heartbeats expose progress and cancellation.
+- **Predict:** If a Worker dies after an external charge but before completion is recorded, predict whether retry can issue that charge again.
+- **Look for:** Identify each timeout type, inspect heartbeat details on retry, and compare the charge ledger before and after a stable idempotency key.
+- **Terminal route:** From this lab directory, run `source ../.venv/bin/activate` before copying any `python ...` command below. The browser action cards select the Python environment for you.
+
 
 `AgentRun` gains its second Activity here: `execute_tool(call: ToolCall) -> ToolResult`, keyed,
 heartbeating, with a `RetryPolicy`. `AgentRun.run(goal, scenario)` plans three steps — `call_llm`,

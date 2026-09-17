@@ -10,6 +10,13 @@ a history by hand and check yourself against the SDK.
 
 **By the end:** Predict the next event, hand a run to another Worker, and compare a manual replay with the SDK’s replay.
 
+## Before you run
+
+- **Mechanism:** Workflow code emits Commands. The Service turns them into Events; replay feeds recorded Events back to the code until it reaches new work.
+- **Predict:** After the handoff, predict whether the second Worker starts the `call_llm` Activity again or reconstructs its result from history.
+- **Look for:** Match each Command to its Event, compare Worker identities, and check `CALL_LLM_INVOCATIONS`. Keep the three services from Lab 1 running; opening this lab does not start new ports.
+- **Terminal route:** From this lab directory, run `source ../.venv/bin/activate` before copying any `python ...` command below. The browser action cards select the Python environment for you.
+
 
 The program is unchanged from lab 1 (`plan()` → `call_llm` → 20 s timer → finish). Two
 instruments were added to `workflows.py`: a `CALL_LLM_INVOCATIONS` counter inside the Activity,

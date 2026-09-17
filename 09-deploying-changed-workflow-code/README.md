@@ -12,6 +12,13 @@ continue-as-new (9.3).
 
 **By the end:** Use replay tests and Worker routing to compare versions and identify a history that new code cannot replay.
 
+## Before you run
+
+- **Mechanism:** A changed Workflow must still replay old histories unless routing keeps old runs on old code. Patching records a branch choice; Worker Versioning routes executions to a compatible build.
+- **Predict:** Before deploying v2, predict which old run will fail replay, which will stay pinned, and which can upgrade at Continue-As-New.
+- **Look for:** Compare the replay result, patch marker, routing assignment, and Run ID transition. Identify the exact compatibility boundary.
+- **Terminal route:** From this lab directory, run `source ../.venv/bin/activate` before copying any `python ...` command below. The browser action cards select the Python environment for you.
+
 
 ```
 labs/09-deploying-changed-workflow-code/

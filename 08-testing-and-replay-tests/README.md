@@ -10,6 +10,13 @@ purpose, and finally read a broken history with no source and say what happened.
 
 **By the end:** Use time-skipping, replay, Activity fakes, and injected failures to catch regressions before deployment.
 
+## Before you run
+
+- **Mechanism:** Workflow tests exercise logic with mocked Activities and time skipping. Replay tests check old histories against changed Workflow code. Activity tests check effects and heartbeat behavior.
+- **Predict:** Predict which test catches a newly inserted Workflow Command and which test catches a duplicate external effect.
+- **Look for:** For each test, name the failure it detects and one failure it cannot. Use the forensic exercise to check those claims against history.
+- **Terminal route:** From this lab directory, run `source ../.venv/bin/activate` before copying any `python ...` command below. The browser action cards select the Python environment for you.
+
 
 `workflows.py` is AgentRun at stage 8: the loop from labs 1–7 (`plan()`, `call_llm`,
 `execute_tool` with timeouts / RetryPolicy / heartbeats / idempotency key, the L05 Signals,

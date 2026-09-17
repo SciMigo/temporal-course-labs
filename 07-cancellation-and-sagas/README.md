@@ -10,6 +10,13 @@ that is already running.
 
 **By the end:** Observe the compensation order after a crash and test how cancellation reaches a running Activity.
 
+## Before you run
+
+- **Mechanism:** A saga stores enough information to compensate completed effects in reverse order. Cancellation is a request that Workflow code handles; an Activity notices it through heartbeats.
+- **Predict:** Predict which undo runs first when step four fails, and whether a non-heartbeating Activity stops immediately on cancel.
+- **Look for:** Read the compensation order in history, then compare cancel with terminate and observe whether cleanup actually ran.
+- **Terminal route:** From this lab directory, run `source ../.venv/bin/activate` before copying any `python ...` command below. The browser action cards select the Python environment for you.
+
 
 Same program as lab 6 plus, in `workflows.py`: `gpu_lane()` (four Activities, each success
 appending its undo to `self.compensations`), `rollback()` (the list in reverse, run from `finally`),

@@ -12,6 +12,13 @@ awaiting an Activity when the run ends is lost unless the main loop drains it fi
 
 **By the end:** Use Signals, Queries, and Updates; then explain which operations write history and how to avoid duplicate or unfinished handler work.
 
+## Before you run
+
+- **Mechanism:** A Signal records an incoming message. A Query reads current Workflow state through a Worker. An Update can validate a request and return a result.
+- **Predict:** Predict which operations still leave evidence when all Workers are down, and which need a Worker to answer.
+- **Look for:** Compare history before and after a Signal, Query, accepted Update, and rejected Update; then inspect the deduplicated note count.
+- **Terminal route:** From this lab directory, run `source ../.venv/bin/activate` before copying any `python ...` command below. The browser action cards select the Python environment for you.
+
 
 Same program as labs 1–4. The one new line that matters is the first line of the loop in
 `workflows.py`: `await workflow.wait_condition(lambda: not self.paused or self.status != "running")`.

@@ -11,6 +11,13 @@ Reading page: "Capstone — A Durable Agent Runtime" (module 11 of the course).
 
 **By the end:** Run the capstone through multiple lanes, bounded histories, and failure cases; explain what each mechanism protects.
 
+## Before you run
+
+- **Mechanism:** The capstone combines one agent loop with durable history, idempotent Activities, bounded Runs, message handlers, compensation, versioning, and separate Worker lanes.
+- **Predict:** Before running the failure suite, predict the evidence each injected failure should leave and which component is responsible for recovery.
+- **Look for:** Keep a short evidence ledger: history event or Run ID, external effect key, queue/poller state, and the mechanism that explains the outcome.
+- **Terminal route:** From this lab directory, run `source ../.venv/bin/activate` before copying any `python ...` command below. The browser action cards select the Python environment for you.
+
 
 Everything is the same names as L01–L10. Nothing here is new; the exam is that it is all in one place.
 

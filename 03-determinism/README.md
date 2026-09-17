@@ -11,6 +11,13 @@ each, read the error the SDK gives you, and fix it. By the end you can read a
 
 **By the end:** Cause three nondeterminism failures, locate each mismatch in the history, and apply a replay-safe fix.
 
+## Before you run
+
+- **Mechanism:** A replayed Workflow must make the same decisions from the same recorded history. Use Temporal’s replay-safe clock and random helpers; put external reads in Activities.
+- **Predict:** Before forcing each replay, predict whether the sandbox will reject the code first or history will reveal a Command mismatch.
+- **Look for:** Record the failing event ID and the `await` that emitted the mismatched Command. Then confirm the corrected version replays.
+- **Terminal route:** From this lab directory, run `source ../.venv/bin/activate` before copying any `python ...` command below. The browser action cards select the Python environment for you.
+
 
 `workflows.py` is lab 2's `AgentRun` plus the two things a real agent is tempted to do in Workflow
 code: consult the clock in `plan()` (a time budget) and consult the model in `plan()` (the next

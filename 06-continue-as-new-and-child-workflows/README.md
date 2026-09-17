@@ -9,6 +9,13 @@ a Child Workflow that has a history — and a Worker — of its own.
 
 **By the end:** Trace a continue-as-new chain and a Child Workflow through their separate histories and Worker failures.
 
+## Before you run
+
+- **Mechanism:** Continue-As-New closes one Run and starts another under the same Workflow ID with an explicit state snapshot. A Child Workflow has its own ID, history, and lifecycle.
+- **Predict:** Predict what state would disappear if it were omitted from the continue-as-new snapshot.
+- **Look for:** Trace the Run ID chain and the parent/child histories separately. Restart the child Worker and see which execution resumes.
+- **Terminal route:** From this lab directory, run `source ../.venv/bin/activate` before copying any `python ...` command below. The browser action cards select the Python environment for you.
+
 
 Same program as lab 5 plus two things in `workflows.py`: the continue-as-new check at the top of
 the loop, with `AgentState` as the checkpoint, and a `research` step that `plan()` hands to

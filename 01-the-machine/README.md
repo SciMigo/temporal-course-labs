@@ -9,6 +9,13 @@ of the process running it, then say where the program counter went.
 
 **By the end:** Start `AgentRun`, kill its Worker during a timer, and explain from the event history why another Worker can finish the same run.
 
+## Before you run
+
+- **Mechanism:** The Worker runs Workflow and Activity code; the Temporal Service stores history and owns the timer. The service can record that the timer fired while no Worker is alive.
+- **Predict:** If the Worker dies during the timer, predict what can advance without it and what must wait for another Worker.
+- **Look for:** Compare `TimerFired`, Workflow Task identities, and the `call_llm` invocation count. The new Worker should continue the run without repeating the completed Activity.
+- **Terminal route:** From this lab directory, run `source ../.venv/bin/activate` before copying any `python ...` command below. The browser action cards select the Python environment for you.
+
 `AgentRun` is the one program this course builds: an agent loop (decide a step, call a model or tool,
 look at the result, repeat) whose parts have fixed names — `plan()` decides in Workflow code, `call_llm` and
 `execute_tool` act as Activities. Stage 1 is deliberately tiny; every later lab adds one capability to this

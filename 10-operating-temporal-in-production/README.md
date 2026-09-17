@@ -11,6 +11,13 @@ client. Reading page: "Operating Temporal in Production"; long form in appendice
 
 **By the end:** Register search attributes, route work to Task Queues, and diagnose a stalled lane from the UI and client.
 
+## Before you run
+
+- **Mechanism:** Task Queues route work to Worker pools; they are not the Event History. Search Attributes help operators find runs, while pending Tasks and timeouts reveal a stalled lane.
+- **Predict:** If the GPU pool disappears, predict what stays durable and where waiting work becomes visible.
+- **Look for:** Check the queue backlog and pollers, `schedule_to_start_timeout`, and the run’s Search Attributes before and after the pool returns.
+- **Terminal route:** From this lab directory, run `source ../.venv/bin/activate` before copying any `python ...` command below. The browser action cards select the Python environment for you.
+
 
 Nothing in the agent loop changes. What changes is one keyword argument per Activity call
 (`task_queue=`), one timeout you had probably been leaving unset (`schedule_to_start_timeout`), and
