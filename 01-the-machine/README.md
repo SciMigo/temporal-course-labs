@@ -11,7 +11,9 @@ same file. Reading page: "The program this course builds".
 ## 1.1 Bring it up
 **Option A — local page:** Click **Prepare this lab**, **Start Worker**, then **Run starter.py** in
 the panel above. These buttons install the lab's Python packages, set `TASK_QUEUE=lab-01`, and use the
-right working directory. Do not run the terminal commands below.
+right working directory. The starter runs in the background while you do the crash experiment;
+click **Starter output** to see its progress and eventual result. Do not run the terminal commands
+below.
 
 **Option B — terminals:** Leave the Temporal dev server from the course setup running. In the
 `temporal-course-labs` directory, create a virtual environment with Python 3.11 or newer, install
@@ -69,7 +71,7 @@ lives while no process is running it. So do not restart anything yet.
 6. Count the `call_llm key=...` log lines across both Worker terminals (the killed Worker's output is
    still on screen; on the local lab page, **Worker output** shows both). There is exactly one, and it
    came from the Worker you killed. Yet the new Worker finished `AgentRun`, and `starter.py` printed
-   the model's answer as the result. The new process never called the model, and it ran
+   the model's answer as the result (see **Starter output** on the local page). The new process never called the model, and it ran
    `self.context_summary = answer` all the same. Where did `answer` come from?
 
 Which events prove the Service was making progress while your application compute was absent? (12

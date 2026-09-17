@@ -266,6 +266,8 @@ def lab_page(name: str) -> bytes | None:
         lab_text = (lab_text[:start] + """## 1.1 Bring it up
 Your three setup terminals are already running. Click **1 · Prepare this lab** above to install its
 Python packages and set `TASK_QUEUE=lab-01`, then **2 · Start Worker** and **3 · Run starter.py**.
+The starter keeps running in the background while you do the crash experiment; click
+**Starter output** to see its progress and eventual result.
 You do not need to change directories or run Python commands in a terminal for Option A.
 
 In the [Temporal Web UI](http://localhost:8233), find `agent-42`. Read the events:
@@ -326,12 +328,20 @@ def console_panel(name: str, d: Path) -> str:
     )
     starter = (
         "import subprocess, sys, os\n"
-        "r = subprocess.run([sys.executable, 'starter.py'], cwd=os.getcwd(), env=os.environ,\n"
-        "    capture_output=True, text=True, timeout=180)\n"
-        "print(r.stdout[-3000:] or r.stderr[-3000:])"
+        "STARTER = globals().get('STARTER')\n"
+        "if STARTER and STARTER.poll() is None: print('starter already running, pid', STARTER.pid)\n"
+        "else:\n"
+        "    STARTER = subprocess.Popen([sys.executable, 'starter.py'], cwd=os.getcwd(),\n"
+        "        env={**os.environ, 'PYTHONUNBUFFERED':'1'},\n"
+        "        stdout=open('starter.out','wb'), stderr=subprocess.STDOUT, start_new_session=True)\n"
+        "    globals()['STARTER'] = STARTER\n"
+        "    print('starter pid', STARTER.pid, '| see Starter output for progress and result')"
     )
     tail = (
         "print(open('worker.out').read()[-3000:] if os.path.exists('worker.out') else 'no worker output yet')"
+    )
+    starter_tail = (
+        "print(open('starter.out').read()[-3000:] if os.path.exists('starter.out') else 'no starter output yet')"
     )
     def b(label, code, primary=False):
         cls = "run primary" if primary else "run"
@@ -340,14 +350,16 @@ def console_panel(name: str, d: Path) -> str:
 <h2>Run it here</h2>
 <p class="hint">With Option A already set up, use these buttons for this lab. <strong>Prepare this
 lab</strong> installs its Python packages and sets its Task Queue; then start the Worker and run the
-starter. The kill button sends <code>SIGKILL</code> to the Worker. Terminal commands in the exercise
-below describe Option B.</p>
+starter. The starter runs in the background so you can kill the Worker while its timer is pending.
+Use <strong>Starter output</strong> to see its progress and result. The kill button sends
+<code>SIGKILL</code> to the Worker. Terminal commands in the exercise below describe Option B.</p>
 <div class="btns" data-lab="{html.escape(name)}">
   {b("1 · Prepare this lab", prepare, True)}
   {b("2 · Start Worker", worker)}
   {b("3 · Run starter.py", starter)}
   {b("kill -9 the Worker", kill)}
   {b("Worker output", tail)}
+  {b("Starter output", starter_tail)}
 </div>
 <div class="out" id="out-panel" hidden></div>
 <details><summary>Python console</summary>
