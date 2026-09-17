@@ -5,8 +5,6 @@ append next, hand the execution from one Worker to another and diff what each on
 a history by hand and check yourself against the SDK.
 
 
-**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/02-event-history-and-replay), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
-
 The program is unchanged from lab 1 (`plan()` → `call_llm` → 20 s timer → finish). Two
 instruments were added to `workflows.py`: a `CALL_LLM_INVOCATIONS` counter inside the Activity,
 and `workflow.logger` lines before every `await` — the SDK suppresses those during replay, so the

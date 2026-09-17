@@ -6,8 +6,6 @@ each, read the error the SDK gives you, and fix it. By the end you can read a
 `await` that produced the mismatching Command.
 
 
-**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/03-determinism), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
-
 `workflows.py` is lab 2's `AgentRun` plus the two things a real agent is tempted to do in Workflow
 code: consult the clock in `plan()` (a time budget) and consult the model in `plan()` (the next
 step). The environment variable `LAB03_BREAK` selects which *build* a Worker runs — `none`

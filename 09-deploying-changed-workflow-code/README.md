@@ -7,8 +7,6 @@ side by side with Worker Versioning (9.2), and let a pinned agent upgrade at its
 continue-as-new (9.3).
 
 
-**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/09-deploying-changed-workflow-code), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
-
 ```
 labs/09-deploying-changed-workflow-code/
   workflows.py                 v1 — lab 8's AgentRun + the continue-as-new upgrade point; NO verify step

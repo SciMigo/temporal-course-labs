@@ -6,8 +6,6 @@ it cannot; and write down `execute_tool`'s timeouts, retry policy, heartbeat and
 for each number.
 
 
-**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/04-activities-and-failure-semantics), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
-
 `AgentRun` gains its second Activity here: `execute_tool(call: ToolCall) -> ToolResult`, keyed,
 heartbeating, with a `RetryPolicy`. `AgentRun.run(goal, scenario)` plans three steps — `call_llm`,
 one tool call, finish — and `scenario` picks the tool and the options the Workflow invokes it with

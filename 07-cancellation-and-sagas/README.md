@@ -5,8 +5,6 @@ Worker death, and then find out what `handle.cancel()` does — and does not do 
 that is already running.
 
 
-**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/07-cancellation-and-sagas), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
-
 Same program as lab 6 plus, in `workflows.py`: `gpu_lane()` (four Activities, each success
 appending its undo to `self.compensations`), `rollback()` (the list in reverse, run from `finally`),
 and a `crunch` tool that is deliberately long. Reading page: "Cancellation and Compensation".

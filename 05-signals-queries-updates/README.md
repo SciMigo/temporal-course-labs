@@ -7,8 +7,6 @@ leave nothing behind, a message delivered twice is applied once, and a handler t
 awaiting an Activity when the run ends is lost unless the main loop drains it first.
 
 
-**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/05-signals-queries-updates), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
-
 Same program as labs 1–4. The one new line that matters is the first line of the loop in
 `workflows.py`: `await workflow.wait_condition(lambda: not self.paused or self.status != "running")`.
 Reading page: "Signals, Queries, and Updates".

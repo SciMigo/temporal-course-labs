@@ -5,8 +5,6 @@ tests with a fake context, and replay tests over recorded histories — then inj
 purpose, and finally read a broken history with no source and say what happened.
 
 
-**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/08-testing-and-replay-tests), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
-
 `workflows.py` is AgentRun at stage 8: the loop from labs 1–7 (`plan()`, `call_llm`,
 `execute_tool` with timeouts / RetryPolicy / heartbeats / idempotency key, the L05 Signals,
 Query and Update, the L06 snapshot and continue-as-new, the L07 compensation list). No real

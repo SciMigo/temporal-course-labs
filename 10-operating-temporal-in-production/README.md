@@ -6,8 +6,6 @@ answer the operator's five questions about a run you did not start — from the 
 client. Reading page: "Operating Temporal in Production"; long form in appendices A1 and A3.
 
 
-**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/10-operating-temporal-in-production), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
-
 Nothing in the agent loop changes. What changes is one keyword argument per Activity call
 (`task_queue=`), one timeout you had probably been leaving unset (`schedule_to_start_timeout`), and
 three Search Attributes the run publishes about itself.

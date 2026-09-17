@@ -6,8 +6,6 @@ requirements say it will be broken and watch it recover; then defend every box i
 Reading page: "Capstone — A Durable Agent Runtime" (module 11 of the course).
 
 
-**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/11-capstone-durable-agent-runtime), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
-
 Everything is the same names as L01–L10. Nothing here is new; the exam is that it is all in one place.
 
 | File | What it is |
