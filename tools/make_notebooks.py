@@ -19,6 +19,8 @@ from __future__ import annotations
 
 import re
 import sys
+import hashlib
+from difflib import SequenceMatcher
 from pathlib import Path
 
 import jupytext
@@ -133,6 +135,30 @@ def build(lab: str) -> Path:
     nb.metadata["jupytext"] = {"main_language": "python"}
     nb.metadata["kernelspec"] = {"display_name": "Python 3", "language": "python", "name": "python3"}
     out = ROOT / lab / f"lab-{lab[:2]}.ipynb"
+    # Keep notebook cell identities stable across README-only edits. Jupyter uses IDs to track
+    # cells; replacing every ID on each build makes a small prose change look like a full rewrite.
+    old_cells = nbformat.read(out, as_version=4).cells if out.exists() else []
+    signature = lambda cell: (cell.cell_type, cell.source)
+    matcher = SequenceMatcher(None, list(map(signature, old_cells)),
+                              list(map(signature, nb.cells)), autojunk=False)
+    used_ids = set()
+    for old_start, new_start, length in matcher.get_matching_blocks():
+        for old_cell, new_cell in zip(old_cells[old_start:old_start + length],
+                                      nb.cells[new_start:new_start + length]):
+            if old_cell.id not in used_ids:
+                new_cell.id = old_cell.id
+                used_ids.add(new_cell.id)
+    for cell in nb.cells:
+        if cell.id in used_ids:
+            continue
+        seed = f"{lab}\0{cell.cell_type}\0{cell.source}".encode("utf-8")
+        digest = hashlib.sha256(seed).hexdigest()
+        cell.id = digest[:8]
+        suffix = 1
+        while cell.id in used_ids:
+            cell.id = hashlib.sha256(seed + str(suffix).encode()).hexdigest()[:8]
+            suffix += 1
+        used_ids.add(cell.id)
     jupytext.write(nb, out, fmt="ipynb")
     return out
 
