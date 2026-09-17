@@ -300,6 +300,7 @@ def console_panel(name: str, d: Path) -> str:
     prepare = (
         "import subprocess, sys, os\n"
         f"os.chdir({lab_dir!r})\n"
+        "globals()['WORKER_LOG_OFFSET'] = os.path.getsize('worker.out') if os.path.exists('worker.out') else 0\n"
         f"sys.path[:0] = [{lab_dir!r}, {labs_root!r}]\n"
         f"os.environ['TASK_QUEUE'] = {queue!r}\n"
         "print(subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', '-r',\n"
@@ -338,7 +339,11 @@ def console_panel(name: str, d: Path) -> str:
         "    print('starter pid', STARTER.pid, '| see Starter output for progress and result')"
     )
     tail = (
-        "print(open('worker.out').read()[-3000:] if os.path.exists('worker.out') else 'no worker output yet')"
+        "if os.path.exists('worker.out'):\n"
+        "    with open('worker.out', 'rb') as f:\n"
+        "        f.seek(globals().get('WORKER_LOG_OFFSET', 0))\n"
+        "        print(f.read()[-3000:].decode(errors='replace') or 'no worker output yet')\n"
+        "else: print('no worker output yet')"
     )
     starter_tail = (
         "print(open('starter.out').read()[-3000:] if os.path.exists('starter.out') else 'no starter output yet')"
