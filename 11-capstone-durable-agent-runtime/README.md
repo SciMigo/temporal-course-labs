@@ -24,7 +24,7 @@ Everything is the same names as L01–L10. Nothing here is new; the exam is that
 | File | What it is |
 |---|---|
 | `agentrun/workflows.py` | `AgentRun` (`plan()`, the loop, Signals, Query, Update, continue-as-new, cancellation, compensations) and `ResearchAgent` |
-| `agentrun/activities.py` | `call_llm`, `execute_tool`, `evaluate`, `compensate` — fakes that keep **ledgers by idempotency key** (`LLM_CACHE`, `TOOL_LEDGER`, `TOOL_SIDE_EFFECTS`, `COMPENSATED`) |
+| `agentrun/activities.py` | `call_llm`, `execute_tool`, `evaluate`, `compensate` — fakes that keep **in-process ledgers by idempotency key** (`LLM_CACHE`, `TOOL_LEDGER`, `TOOL_SIDE_EFFECTS`, `COMPENSATED`); a production ledger must be durable across Worker hosts and reconcile unknown provider outcomes |
 | `agentrun/models.py` | `Step`, `ToolCall`, `ToolResult`, `Verdict`, `AgentState` (the continue-as-new snapshot) |
 | `agentrun/lanes.py`, `agentrun/search_attributes.py` | `agent-workflows` / `cpu-tools` / `gpu-tools`; `AgentStatus` / `CurrentStep` / `Owner` |
 | `worker_workflows.py`, `worker_cpu.py`, `worker_gpu.py` | one process per lane, as in lab 10 |
@@ -155,8 +155,8 @@ registering its own `execute_tool` under the same Activity name — the Workflow
 
 | Test | Injection | What it asserts |
 |---|---|---|
-| `test_worker_crash_mid_run_loses_no_work_and_spends_nothing_twice` | all three pools cancelled mid-GPU-step; new pools with new identities | run finishes 6/6; every LLM key billed once; every tool effect once; both Worker identities in the history; `AgentStatus=done`. Also: with no Worker alive a **Query** hits its deadline (`Query deadline of 1999 milliseconds exceeded`) while **Describe** answers — a Query is computed by a Worker |
-| `test_stalled_attempt_times_out_on_heartbeat_and_the_retry_resumes` | attempt 1 heartbeats to tick 2, then hangs | attempt 2 resumes from tick 2; `attempts == 1`; one effect; **no `ACTIVITY_TASK_TIMED_OUT` event** — a retried timeout is not history |
+| `test_worker_crash_mid_run_loses_no_work_and_spends_nothing_twice` | all three pools cancelled mid-GPU-step; new pools with new identities | run finishes 6/6; the fake LLM ledger records one bill per key and the fake tool ledger one effect per key; both Worker identities in the history; `AgentStatus=done`. A real provider may still charge before a gateway records its response. Also: with no Worker alive a **Query** hits its deadline (`Query deadline of 1999 milliseconds exceeded`) while **Describe** answers — a Query is computed by a Worker |
+| `test_stalled_attempt_times_out_on_heartbeat_and_the_retry_resumes` | attempt 1 heartbeats to tick 2, then hangs | attempt 2 reads the delivered heartbeat details and resumes from tick 2; `attempts == 1`; one effect; **no `ACTIVITY_TASK_TIMED_OUT` event** — a retried timeout is not history |
 | `test_completion_lost_after_the_effect_is_not_a_second_effect` | attempt 1 does the work, writes the ledger, raises | one effect; attempt 2 returns `duplicate=True`; no `ACTIVITY_TASK_FAILED` event |
 | `test_cancel_run_signal_finishes_the_step_then_stops_cleanly` | `cancel_run` Signal | completes (not fails) with `status cancelled`; nothing to compensate at a decision point |
 | `test_temporal_cancel_during_the_gpu_step_runs_the_compensation` | `handle.cancel()` while a heartbeating GPU tool runs | `WorkflowFailureError` with `CancelledError`; `compensate("release_gpu:…")` is the last Activity scheduled; `AgentStatus=cancelled`; closed `CANCELED` |

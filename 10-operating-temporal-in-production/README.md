@@ -98,7 +98,9 @@ CPU-only tool ever lands on the GPU lane it fails non-retryably with `BadArgumen
 quietly running on the wrong hardware. Registering the same name on two lanes is the whole trick.)
 
 **Now stall the GPU pool.** Stop `worker_gpu.py` (Ctrl-C is fine here) and start a run with a short
-Schedule-to-Start on the GPU step:
+Schedule-to-Start on the GPU step. This timeout is an application failure boundary for the
+experiment, not an autoscaling trigger. Normally monitor backlog age and Schedule-to-Start latency
+to decide when to add Workers:
 
 ```bash
 GPU_SCHEDULE_TO_START_SECONDS=15 python starter.py --id agent-stall --no-wait     # course value: 5 minutes
@@ -225,7 +227,7 @@ surface that answered each:
 |---|---|---|---|
 | 1 | What happened? | `handle.fetch_history()` — every event, in order | Event History / `temporal workflow show -w <id>` |
 | 2 | What did Temporal think happened? | `handle.describe()` — `status`, `typed_search_attributes`, `raw_description.pending_activities` (state, attempt, last failure, last Worker identity) | summary + Pending Activities / `temporal workflow describe -w <id>` |
-| 3 | What side effects may have occurred? | from the history: every `ACTIVITY_TASK_STARTED` with no terminal event is an attempt that ran; from describe: the attempt count and heartbeat details | Activity events; Pending Activities → heartbeat details |
+| 3 | What side effects may have occurred? | history and pending attempt count show what Temporal observed; heartbeat details show what the Activity reported. Check the provider or operation ledger to establish whether an external effect occurred | Activity events; Pending Activities → heartbeat details; external ledger |
 | 4 | What happens next? | `pending_activities[].scheduled_time` (next attempt), pending timers, pending children | Pending Activities / Timers |
 | 5 | What if every Worker disappears now? | `workflow_service.describe_task_queue(...)` per lane: backlog count, age, pollers | Task Queues page / `temporal task-queue describe --task-queue <lane> --task-queue-type activity` |
 
@@ -310,7 +312,8 @@ Attributes; the fixture registers them with the same Operator Service call as
 If every Worker process dies right now: every lane's backlog, every pending Activity with its attempt
 count, every timer and every Search Attribute survive in the Service. Workers returning to any lane
 drain that lane; a lane with no Workers stalls only the Activities routed to it, and the
-Schedule-to-Start timeout and `task-queue describe` are how that stall becomes visible — you saw both.
+`task-queue describe` and Schedule-to-Start latency show the growing stall; the deliberately short
+Schedule-to-Start timeout turns it into a named Workflow failure for this experiment.
 
 ## What you learned
 
