@@ -103,7 +103,15 @@ document.addEventListener('click', async event => {
     return;
   }
   if (button.id==='command-run') {
-    const raw=document.getElementById('lab-command').value.trim(); if (!raw) return;
+    const input=document.getElementById('lab-command');
+    const raw=input.value.trim();
+    if (!raw) {
+      const panel=document.getElementById('out-panel');
+      panel.textContent='Enter a Python command above, such as '+input.placeholder+'.';
+      panel.classList.add('err');
+      input.focus();
+      return;
+    }
     activeOutput=null;
     const code=commandCode('run_command',raw);
     const result=await runCode(code);

@@ -16,6 +16,7 @@ from __future__ import annotations
 import html
 import json
 import re
+import shlex
 import socket
 import urllib.error
 import urllib.request
@@ -378,6 +379,7 @@ def console_panel(name: str, d: Path) -> str:
 
     setup = code(f"prepare({lab_dir!r}, {labs_root!r}, {base_env(name)!r})")
     status = code("status()")
+    example_command = "python " + shlex.join(LAB_ACTIONS[name[:2]][0]["args"])
     return f'''<section class="lab-workspace" aria-labelledby="workspace-heading">
 <div class="workspace-heading"><div><span class="eyebrow">BROWSER WORKSPACE</span>
 <h2 id="workspace-heading">Run this lab</h2>
@@ -391,10 +393,11 @@ def console_panel(name: str, d: Path) -> str:
 <p>Choose a starting point below. Open Output to follow the process; Crash Worker sends SIGKILL.</p></div></div>
 <div class="action-grid">{''.join(cards)}</div>
 <div class="command-box"><h3>Run another command from the exercise</h3>
-<p>Paste one Python command from this lab, such as <code>python history.py agent-42</code>.
-Arguments and lab-specific environment variables work here. Each command gets its own output log.</p>
+<p>Enter one Python command from this lab, such as <code>{html.escape(example_command)}</code>.
+Use <code>python script.py</code> or <code>python -m pytest</code>; terminal setup commands like
+<code>cd</code> and <code>export</code> do not run here. Each command gets its own output log.</p>
 <div class="command-row"><input id="lab-command" aria-label="Python command" spellcheck="false"
-placeholder="python starter.py --no-wait"><button type="button" class="run primary" id="command-run">Run command</button></div>
+placeholder="{html.escape(example_command, quote=True)}"><button type="button" class="run primary" id="command-run">Run Python command</button></div>
 <div id="command-history" class="command-history"></div></div>
 <div class="output-heading"><h3>Output</h3><span id="output-name">Select an action to see its output</span></div>
 <pre class="out" id="out-panel" aria-live="polite">No action selected yet.</pre>
