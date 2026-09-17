@@ -5,6 +5,9 @@ checkpoint carry a tool run across a Worker death; make a side effect happen twi
 it cannot; and write down `execute_tool`'s timeouts, retry policy, heartbeat and key with a reason
 for each number.
 
+
+**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/04-activities-and-failure-semantics), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
+
 `AgentRun` gains its second Activity here: `execute_tool(call: ToolCall) -> ToolResult`, keyed,
 heartbeating, with a `RetryPolicy`. `AgentRun.run(goal, scenario)` plans three steps — `call_llm`,
 one tool call, finish — and `scenario` picks the tool and the options the Workflow invokes it with
@@ -159,3 +162,16 @@ calls `activity.raise_complete_async()`. The function returns; the Activity does
 exception per timeout; the `shards_hang` checkpoint resumes attempt 2 at shard 5 with no shard
 run twice; `send_hang` / `charge_hang` produce two effects unkeyed and one keyed; and an
 Activity completed from outside the Worker by task token.
+
+## What you learned
+
+- Schedule-to-Start, Start-to-Close, Schedule-to-Close, and Heartbeat timeouts answer different questions.
+- A heartbeat checkpoint can let a retry resume useful work, but the last heartbeat may be behind the last side effect.
+- A stable idempotency key protects an external effect when an Activity attempt runs twice.
+
+## Questions to answer
+
+1. Which timeout proves that no Worker started the Activity, and which only bounds one attempt?
+2. After the Worker dies at shard 5, where does the retry resume and why?
+3. How can a charge happen twice while the Workflow completes only once?
+4. What should the idempotency key identify: a run, an attempt, or the intended effect?

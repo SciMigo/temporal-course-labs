@@ -5,6 +5,9 @@ work on three lanes with three Worker pools, stall one pool and read the stall f
 answer the operator's five questions about a run you did not start — from the UI and from the Python
 client. Reading page: "Operating Temporal in Production"; long form in appendices A1 and A3.
 
+
+**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/10-operating-temporal-in-production), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
+
 Nothing in the agent loop changes. What changes is one keyword argument per Activity call
 (`task_queue=`), one timeout you had probably been leaving unset (`schedule_to_start_timeout`), and
 three Search Attributes the run publishes about itself.
@@ -297,3 +300,16 @@ If every Worker process dies right now: every lane's backlog, every pending Acti
 count, every timer and every Search Attribute survive in the Service. Workers returning to any lane
 drain that lane; a lane with no Workers stalls only the Activities routed to it, and the
 Schedule-to-Start timeout and `task-queue describe` are how that stall becomes visible — you saw both.
+
+## What you learned
+
+- Workflow, CPU, and GPU Task Queues are separate lanes with separate Worker pools and backlogs.
+- A Schedule-to-Start timeout identifies work that no Worker picked up; Search Attributes make stalled runs findable.
+- Queue age, dispatch rate, and last poll time are stronger operational signals than a stale poller name alone.
+
+## Questions to answer
+
+1. Which Event proves the GPU Activity never started during a lane stall?
+2. Why does adding a CPU Worker not drain a GPU backlog?
+3. What can the five-question operator view tell you without opening Worker logs?
+4. How would you distinguish a slow GPU Activity from a GPU lane with no live Worker?

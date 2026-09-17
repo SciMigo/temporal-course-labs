@@ -5,6 +5,9 @@ separate lanes; run it for 200 steps and prove no run's history grew; break it e
 requirements say it will be broken and watch it recover; then defend every box in writing.
 Reading page: "Capstone — A Durable Agent Runtime" (module 11 of the course).
 
+
+**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/11-capstone-durable-agent-runtime), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
+
 Everything is the same names as L01–L10. Nothing here is new; the exam is that it is all in one place.
 
 | File | What it is |
@@ -253,3 +256,16 @@ If every Worker process dies right now: everything AgentRun decided, every recor
 pending timer, Signal and child, every lane's backlog survive in the Service. The next Worker on each
 lane replays or resumes; nothing is re-spent, nothing is lost, nothing was waiting in a process.
 You have now watched that sentence be true seven ways in a test suite and once with `kill -9`.
+
+## What you learned
+
+- Durable decisions, effects, control messages, children, compensations, and lane routing fit into one AgentRun.
+- A bounded sequence of Runs preserves one Workflow ID while each Run keeps a manageable history.
+- Recovery depends on recorded history plus your own idempotency ledger for external effects.
+
+## Questions to answer
+
+1. After every Worker dies, which facts live in Temporal and which live in your effect ledger?
+2. What evidence shows the 200-step agent avoided one unbounded history?
+3. Which Worker pool must return for a queued GPU tool, and which can still serve Queries?
+4. How do the failure-injection tests prove that replay did not repeat a paid or irreversible effect?

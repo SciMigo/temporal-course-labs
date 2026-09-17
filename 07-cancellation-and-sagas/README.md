@@ -4,6 +4,9 @@ Goal: make AgentRun undo what it did when step four of four fails, prove the und
 Worker death, and then find out what `handle.cancel()` does — and does not do — to an Activity
 that is already running.
 
+
+**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/07-cancellation-and-sagas), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
+
 Same program as lab 6 plus, in `workflows.py`: `gpu_lane()` (four Activities, each success
 appending its undo to `self.compensations`), `rollback()` (the list in reverse, run from `finally`),
 and a `crunch` tool that is deliberately long. Reading page: "Cancellation and Compensation".
@@ -267,3 +270,16 @@ undo is keyed.
 without heartbeats leaving `ACTIVITY_TASK_CANCEL_REQUESTED` but no `ACTIVITY_TASK_CANCELED` while
 the tool finishes every chunk on the Worker; a cancel with heartbeats producing `ACTIVITY_TASK_CANCELED`
 and a tool that never finishes; and the shielded tool completing before `release_sandbox` runs.
+
+## What you learned
+
+- A saga records compensation decisions in Workflow state and runs completed undos in reverse order.
+- Activity cancellation is cooperative; a non-heartbeating tool may keep running after a cancel request.
+- Shielding an in-flight effect changes when compensation begins, and every undo still needs an idempotency key.
+
+## Questions to answer
+
+1. Why is there no `unregister_endpoint` compensation after registration fails?
+2. After killing the Worker during rollback, which recorded facts let a new Worker continue the undo list?
+3. Why can a cancel request appear in history while the Activity continues to do work?
+4. What difference do heartbeats and shielding make to the final effect and compensation order?

@@ -31,6 +31,100 @@ NUMBER = re.compile(r"^\s*\d+\. ")
 LABS = sorted(p for p in ROOT.iterdir() if p.is_dir() and re.match(r"\d\d-", p.name))
 
 
+def action(key: str, title: str, args: list[str], detail: str, kind: str = "command",
+           env: dict[str, str] | None = None) -> dict[str, object]:
+    return {"key": key, "title": title, "args": args, "detail": detail, "kind": kind, "env": env or {}}
+
+
+# One-click starting points. The command field below the cards handles the variations in each
+# exercise without pretending that a single default Worker or starter fits all eleven labs.
+LAB_ACTIONS: dict[str, list[dict[str, object]]] = {
+    "01": [
+        action("worker", "Worker", ["worker.py"], "Polls lab-01; crash it during the timer.", "worker"),
+        action("starter", "Start agent-42", ["starter.py"], "Starts the run and waits in the background for its result."),
+    ],
+    "02": [
+        action("worker", "Worker 1", ["worker.py"], "The first Worker for history and replay.", "worker"),
+        action("worker-2", "Worker 2", ["worker.py"], "Use for the two-Worker handoff in 2.3.", "worker"),
+        action("starter", "Start agent-42", ["starter.py"], "Starts a run; its output includes history."),
+        action("history", "Inspect history", ["history.py", "agent-42"], "Read the events and attributes for agent-42."),
+        action("replay", "Replay history", ["replay.py", "agent-42"], "Replay the completed run without another model call."),
+    ],
+    "03": [
+        action("worker-fixed", "Fixed Worker", ["worker.py"], "Runs the deterministic build.", "worker"),
+        action("worker-random", "Randomness build", ["worker.py"], "Use for the random replay experiment.", "worker", {"LAB03_BREAK": "random"}),
+        action("worker-clock", "Clock build", ["worker.py"], "Use for the wall-clock replay experiment.", "worker", {"LAB03_BREAK": "clock"}),
+        action("model-server", "Fake model server", ["model_server.py"], "Needed for the network-read experiment.", "worker"),
+        action("starter", "Start coinflip-1", ["starter.py", "--id", "coinflip-1", "--no-wait"], "Start a run; use the command field for other IDs."),
+        action("failures", "Read failures", ["failures.py", "coinflip-1"], "Inspect Workflow Task failures and retries."),
+    ],
+    "04": [
+        action("worker", "Worker 1", ["worker.py"], "Run Activities and show attempt logs.", "worker"),
+        action("worker-2", "Worker 2", ["worker.py"], "Take over after a crash in 4.2 or 4.3.", "worker"),
+        action("timeout", "Start timeout case", ["starter.py", "start_to_close"], "A first Activity timeout experiment."),
+        action("history", "Inspect timeout", ["history.py", "agent-42-start_to_close"], "Read timeout type and retry events."),
+    ],
+    "05": [
+        action("worker", "Worker", ["worker.py"], "Polls lab-05; crash it in 5.2.", "worker"),
+        action("starter", "Start agent-42", ["starter.py", "--no-wait"], "Start and leave time to send Signals."),
+        action("status", "Query status", ["control.py", "status"], "A Query reads state without writing history."),
+        action("pause", "Pause", ["control.py", "pause"], "Send the pause Signal."),
+        action("resume", "Resume", ["control.py", "resume"], "Send the resume Signal."),
+    ],
+    "06": [
+        action("worker-agent", "Agent Worker", ["worker.py", "--role", "agent"], "Polls the parent AgentRun queue.", "worker"),
+        action("worker-research", "Research Worker", ["worker.py", "--role", "research"], "Polls the child queue; crash this Worker in 6.2.", "worker"),
+        action("starter", "Start agent-42", ["starter.py"], "Read the Run ID chain and child result in its output."),
+    ],
+    "07": [
+        action("worker", "Worker", ["worker.py"], "Watch compensation and heartbeat logs.", "worker"),
+        action("saga", "Start saga", ["starter.py"], "Run the failing deploy_model saga."),
+        action("crunch", "Cancel with heartbeats", ["starter.py", "--tool", "crunch", "--cancel-after", "4", "--heartbeat"], "Compare this with a run without --heartbeat."),
+    ],
+    "08": [
+        action("test-time", "8.1 Time-skipping tests", ["-m", "pytest", "tests/test_81_workflow_time_skipping.py", "-v"], "Run Workflow tests without waiting days."),
+        action("test-replay", "8.2 Replay tests", ["-m", "pytest", "tests/test_82_replay.py", "-v"], "Check new code against saved histories."),
+        action("test-activity", "8.3 Activity tests", ["-m", "pytest", "tests/test_83_activities.py", "-v"], "Test effects with a fake Activity context."),
+        action("test-failure", "8.4 Failure injection", ["-m", "pytest", "tests/test_84_failure_injection.py", "-v"], "Real crash and timeout tests; allow about a minute."),
+        action("worker", "Worker for export", ["worker.py"], "Only needed when creating your own history in 8.2.", "worker"),
+    ],
+    "09": [
+        action("test-patch", "9.1 Replay matrix", ["-m", "pytest", "tests/test_91_patching.py", "-v"], "See which code versions replay each saved history."),
+        action("test-v2", "9.2 v2 loop tests", ["-m", "pytest", "tests/test_92_v2_loop.py", "-v"], "Test the new step before deploying it."),
+        action("worker-v1", "v1 Worker", ["worker.py"], "The original build for a running Workflow.", "worker", {"AGENTRUN_CODE": "v1", "BUILD_ID": "v1"}),
+        action("worker-v2", "patched v2 Worker", ["worker.py"], "A replay-compatible v2 build.", "worker", {"AGENTRUN_CODE": "v2_patched", "BUILD_ID": "v2"}),
+        action("starter", "Start a run", ["starter.py", "--id", "lab09-agent-42"], "Use routing.py commands below for versioning changes."),
+    ],
+    "10": [
+        action("attributes", "Register attributes", ["setup_search_attributes.py"], "Required before any run publishes AgentStatus."),
+        action("worker-workflows", "Workflow pool", ["worker_workflows.py"], "Polls the Workflow Task lane.", "worker"),
+        action("worker-cpu", "CPU pool", ["worker_cpu.py"], "Runs call_llm, search, and evaluate.", "worker"),
+        action("worker-gpu", "GPU pool", ["worker_gpu.py"], "Runs GPU tools; crash it to stall that lane.", "worker"),
+        action("starter", "Start a run", ["starter.py", "--no-wait"], "Inspect its queue routing in the Web UI."),
+        action("five", "Five questions", ["five_questions.py", "five", "lab10-agent-42"], "Read run and lane health from the Python client."),
+    ],
+    "11": [
+        action("attributes", "Register attributes", ["setup_search_attributes.py"], "Required before the capstone run."),
+        action("worker-workflows", "Workflow pool", ["worker_workflows.py"], "Runs AgentRun and ResearchAgent.", "worker"),
+        action("worker-cpu", "CPU pool", ["worker_cpu.py"], "Runs model and CPU tools.", "worker"),
+        action("worker-gpu", "GPU pool", ["worker_gpu.py"], "Runs GPU tools.", "worker"),
+        action("starter", "Start eight steps", ["starter.py", "--id", "agent-42", "--tier", "enterprise", "--max-steps", "8", "--no-wait"], "Run AgentRun, then inspect all three lanes."),
+        action("steps", "Run 200 steps", ["run_200_steps.py", "--steps", "200", "--id", "agent-200"], "Observe the bounded history across Run IDs."),
+        action("tests", "Failure suite", ["-m", "pytest", "tests/test_failure_injection.py", "-v"], "Exercise crash, timeout, duplicate, and cancellation paths."),
+    ],
+}
+
+
+def base_env(name: str) -> dict[str, str]:
+    number = name[:2]
+    env = {"TASK_QUEUE": f"lab-{number}"}
+    if number in {"10", "11"}:
+        env["LAB_PREFIX"] = f"lab{number}-"
+    if number == "09":
+        env["DEPLOYMENT_NAME"] = "lab09-agent-runs"
+    return env
+
+
 def runtime_is_local() -> bool:
     """True when the runtime URL points at this machine."""
     from urllib.parse import urlparse
@@ -67,16 +161,14 @@ def md_to_html(md: str, lab: str) -> str:
             import textwrap as _tw
             code = _tw.dedent("\n".join(block))
             n += 1
-            runnable = lang == "python"
-            btn = (f'<button class="run" data-cell="c{n}">Run in your runtime</button>'
-                   if runnable else '<button class="copy">Copy</button>')
-            out.append(f'<div class="code"{f' data-lab="{html.escape(lab)}"' if runnable else ""}>'
-                       f'<pre><code>{html.escape(code)}</code></pre>{btn}'
-                       f'<div class="out" id="out-c{n}" hidden></div></div>')
+            out.append('<div class="code">'
+                       f'<pre><code>{html.escape(code)}</code></pre>'
+                       '<button type="button" class="copy">Copy</button></div>')
             continue
         if line.startswith("#"):
             lvl = len(line) - len(line.lstrip("#"))
-            out.append(f"<h{lvl}>{inline(line[lvl:].strip())}</h{lvl}>")
+            heading = line[lvl:].strip()
+            out.append(f'<h{lvl} id="{heading_id(heading)}">{inline(heading)}</h{lvl}>')
         elif line.startswith("|"):
             rows = []
             while i < len(lines) and lines[i].startswith("|"):
@@ -116,6 +208,24 @@ def inline(t: str) -> str:
     return re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', t)
 
 
+def heading_id(title: str) -> str:
+    plain = re.sub(r"[`*_]", "", title.lower())
+    return re.sub(r"[^a-z0-9]+", "-", plain).strip("-")
+
+
+def readme_intro(text: str) -> tuple[str, str, str]:
+    lines = text.splitlines()
+    title = lines[0].lstrip("# ").strip()
+    start = next((i for i, line in enumerate(lines) if line.startswith("Goal:")), 1)
+    end = start
+    while end < len(lines) and lines[end].strip():
+        end += 1
+    goal = " ".join(line.strip() for line in lines[start:end]).removeprefix("Goal: ")
+    goal = goal[:1].upper() + goal[1:]
+    rest = "\n".join(lines[end + 1:])
+    return title, goal, rest
+
+
 def table(rows: list[str]) -> str:
     cells = [[c.strip() for c in r.strip().strip("|").split("|")] for r in rows]
     cells = [c for c in cells if not all(set(x) <= set("-: ") for x in c)]
@@ -126,128 +236,44 @@ def table(rows: list[str]) -> str:
     return f"<table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>"
 
 
-PAGE = """<!doctype html><meta charset="utf-8"><title>{title}</title>
-<style>
-:root{{--bg:#fff;--fg:#1a1a2e;--muted:#5b5b70;--border:#e0e0e8;--code:#f4f4f8;--accent:#0f5f8f;--ok:#1a7f4b;--bad:#b3261e}}
-@media(prefers-color-scheme:dark){{:root{{--bg:#14141f;--fg:#e0e0e8;--muted:#a0a0b8;--border:#2a2a4e;--code:#1e1e2e;--accent:#7ba4d9;--ok:#3ddc84;--bad:#ff6b6b}}}}
-*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,sans-serif}}
-.wrap{{max-width:52rem;margin:0 auto;padding:1.5rem}}
-nav{{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--border);padding:.6rem 0;margin-bottom:1rem;font-size:.9rem}}
-nav a{{color:var(--accent);margin-right:.8rem;text-decoration:none}}
-.status{{display:flex;gap:1rem;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin-top:.4rem}}
-.dot{{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;margin-right:.35rem}}
-.up{{background:var(--ok)}}.down{{background:var(--bad)}}
-h1{{font-size:1.7rem}}h2{{font-size:1.25rem;margin-top:2rem}}h3{{font-size:1.05rem}}
-pre{{background:var(--code);padding:.8rem;border-radius:6px;overflow-x:auto;margin:0}}
-code{{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.9em}}
-p code,li code,td code{{background:var(--code);padding:.1rem .3rem;border-radius:4px}}
-table{{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.92rem}}
-th,td{{border:1px solid var(--border);padding:.4rem .6rem;text-align:left;vertical-align:top}}
-blockquote{{border-left:4px solid var(--accent);padding:.4rem 1rem;margin:1rem 0;color:var(--muted)}}
-.code{{margin:1rem 0}}
-button.run{{margin-top:.4rem;font:inherit;font-size:.85rem;padding:.25rem .7rem;border:1px solid var(--border);
-  background:var(--bg);color:var(--accent);border-radius:5px;cursor:pointer}}
-button.run:disabled{{opacity:.5;cursor:default}}
-.out{{background:var(--code);border-left:3px solid var(--accent);padding:.6rem;margin-top:.4rem;
-  white-space:pre-wrap;font-family:ui-monospace,Menlo,monospace;font-size:.85em}}
-.out.err{{border-left-color:var(--bad)}}
-.hint{{color:var(--muted);font-size:.85rem}}
-.warn{{border:1px solid #b3261e;border-left-width:4px;border-radius:6px;padding:.5rem .8rem;margin:.5rem 0;
-  font-size:.88rem;background:rgba(179,38,30,.08)}}
-.panel{{border:1px solid var(--border);border-radius:8px;padding:.9rem 1rem;margin:1rem 0;background:var(--code)}}
-.panel h2{{margin-top:0}}.btns{{display:flex;gap:.5rem;flex-wrap:wrap}}
-button.primary{{border-color:var(--accent)}}
-button.copy{{margin-top:.4rem;font:inherit;font-size:.8rem;padding:.2rem .6rem;border:1px solid var(--border);
-  background:var(--bg);color:var(--muted);border-radius:5px;cursor:pointer}}
-textarea{{width:100%;font-family:ui-monospace,Menlo,monospace;font-size:.85rem;padding:.5rem;
-  background:var(--bg);color:var(--fg);border:1px solid var(--border);border-radius:6px}}
-details{{margin-top:.8rem}}summary{{cursor:pointer;color:var(--accent);font-size:.9rem}}
-</style>
-<div class="wrap">
-<nav><a href="/">All labs</a>{nav}
-{banner}<div class="status">
-  <span><span class="dot {rt_cls}"></span>runtime :9477 {rt_txt}</span>
-  <span><span class="dot {tp_cls}"></span>Temporal :7233 {tp_txt}</span>
-  <span><a href="http://localhost:8233" target="_blank">Web UI</a></span>
-</div></nav>
-{body}
-</div>
-<script>
-const RT = "{runtime}";
-async function post(path, payload) {{
-  const r = await fetch(RT + path, {{method:"POST", headers:{{"Content-Type":"application/json"}},
-    body: JSON.stringify(payload)}});
-  return {{status: r.status, json: await r.json().catch(() => null)}};
-}}
-function render(el, res) {{
-  el.hidden = false; el.classList.remove("err");
-  if (res.status !== 200) {{ el.classList.add("err"); el.textContent = "runtime said " + res.status + ": " +
-    JSON.stringify(res.json); return; }}
-  const j = res.json, parts = [];
-  for (const o of (j.outputs || [])) {{
-    const c = o.content || o;
-    if (c.text) parts.push(c.text);
-    else if (c.data && c.data["text/plain"]) parts.push(c.data["text/plain"]);
-    else if (c.ename) parts.push(c.ename + ": " + c.evalue);
-  }}
-  if (j.error) {{ el.classList.add("err"); parts.push(j.error.ename + ": " + j.error.evalue); }}
-  el.textContent = parts.join("\\n") || "(no output)";
-}}
-const LAB = document.querySelector(".btns")?.dataset.lab;
-async function runCode(out, code, lab) {{
-  out.hidden = false; out.classList.remove("err"); out.textContent = "running…";
-  try {{ render(out, await post("/cell/run", {{lab_id: lab || LAB, code}})); }}
-  catch (err) {{ out.classList.add("err");
-    out.textContent = "Could not reach the runtime at " + RT + ".\\nStart it with:  agent-runtime serve\\n" + err; }}
-}}
-document.addEventListener("click", async (e) => {{
-  const copy = e.target.closest("button.copy");
-  if (copy) {{ await navigator.clipboard.writeText(copy.closest(".code").querySelector("code").textContent);
-    copy.textContent = "Copied"; setTimeout(() => copy.textContent = "Copy", 1200); return; }}
-  const btn = e.target.closest("button.run"); if (!btn) return;
-  btn.disabled = true;
-  if (btn.id === "console-run") {{
-    await runCode(document.getElementById("out-console"), document.getElementById("console").value);
-  }} else if (btn.dataset.inline !== undefined) {{
-    await runCode(document.getElementById("out-panel"), btn.dataset.inline);
-  }} else {{
-    const box = btn.closest(".code");
-    await runCode(box.querySelector(".out"), box.querySelector("code").textContent, box.dataset.lab);
-  }}
-  btn.disabled = false;
-}});
-</script>
-"""
+PAGE = (ROOT / "lab_page_template.html").read_text(encoding="utf-8")
 
-
-def shell(title: str, body: str, nav: str = "") -> bytes:
+def shell(title: str, body: str, nav: str = "", lab: str = "") -> bytes:
     rt, tp = runtime_up(), port_open(7233)
     banner = "" if runtime_is_local() else (
         '<div class="warn"><strong>Remote runtime.</strong> This page is sending your code to '
         f'<code>{html.escape(RUNTIME)}</code>, not to your own machine. Anyone who learns that URL '
         "and its token can run code on whatever host is behind it. Use a short-lived tunnel, and "
         "stop it when you finish the lab.</div>")
-    return PAGE.format(
-        banner=banner,
-        title=html.escape(title), body=body, nav=nav, runtime=RUNTIME,
-        rt_cls="up" if rt else "down", rt_txt="ready" if rt else "not running",
-        tp_cls="up" if tp else "down", tp_txt="ready" if tp else "not running",
-    ).encode()
+    values = {
+        "TITLE": html.escape(title), "BODY": body, "NAV": nav, "BANNER": banner,
+        "RUNTIME_JSON": json.dumps(RUNTIME), "LAB_JSON": json.dumps(lab),
+        "ROOT_JSON": json.dumps(str(ROOT)),
+        "RT_CLASS": "up" if rt else "down", "RT_TEXT": "ready" if rt else "not running",
+        "TP_CLASS": "up" if tp else "down", "TP_TEXT": "ready" if tp else "not running",
+    }
+    page = PAGE
+    for key, value in values.items():
+        page = page.replace(f"%%{key}%%", value)
+    return page.encode()
 
 
 def index() -> bytes:
-    rows = "".join(
-        f'<li><a href="/lab/{p.name}">{html.escape(p.name)}</a></li>' for p in LABS)
-    body = f"""<h1>Durable Execution with Temporal — labs</h1>
-<p>Eleven labs, one program. The reading for each module is on
-<a href="https://scimigo.com/learn/temporal-durable-execution">the course site</a>; this server is
-the code, running on your machine.</p>
-<p>If you followed Option A on the course page, your three terminals are already set up. Check that
-runtime and Temporal say <strong>ready</strong> above, then open Lab 1. Its <strong>Prepare this lab</strong>
-button installs the Python packages and sets the Task Queue for that lab.</p>
-<p class="hint">If either service says <strong>not running</strong>, return to the course setup and
-start it before using the lab buttons.</p>
-<h2>Labs</h2><ol>{rows}</ol>"""
+    cards = []
+    for p in LABS:
+        title, goal, _ = readme_intro((p / "README.md").read_text(encoding="utf-8"))
+        cards.append(f'<li><a class="index-card" href="/lab/{p.name}">'
+                     f'<span class="eyebrow">LAB {p.name[:2]}</span><strong>{html.escape(title)}</strong>'
+                     f'<p>{html.escape(goal)}</p></a></li>')
+    body = f'''<section class="hero"><span class="eyebrow">DURABLE EXECUTION WITH TEMPORAL</span>
+<h1>Learn by running the system</h1><p>Eleven labs build one durable agent. Each lab has browser
+controls, the original exercise, and questions to check your understanding.</p></section>
+<section class="lab-reading"><h2>Before you begin</h2><p>The lab server, Agent Runtime, and
+Temporal should show ready above. If you followed Option A on the course page, open Lab 1 and
+click <strong>Prepare this lab</strong>. Each later lab has its own process controls and Task Queue.</p>
+<p>The <a href="https://scimigo.com/learn/temporal-durable-execution">course readings</a> explain
+the concepts; these pages run the code locally.</p></section>
+<h2>Choose a lab</h2><ol class="index-grid">{''.join(cards)}</ol>'''
     return shell("Temporal labs", body)
 
 
@@ -264,10 +290,9 @@ def lab_page(name: str) -> bytes | None:
         start = lab_text.index("## 1.1 Bring it up")
         end = lab_text.index("## 1.2 Kill the Worker", start)
         lab_text = (lab_text[:start] + """## 1.1 Bring it up
-Your three setup terminals are already running. Click **1 · Prepare this lab** above to install its
-Python packages and set `TASK_QUEUE=lab-01`, then **2 · Start Worker** and **3 · Run starter.py**.
-The starter keeps running in the background while you do the crash experiment; click
-**Starter output** to see its progress and eventual result.
+Your setup services are already running. Click **Prepare this lab**, then **Run** on the Worker and
+Start agent-42 cards above. The starter keeps running in the background while you do the crash
+experiment; its Output button shows progress and the eventual result.
 You do not need to change directories or run Python commands in a terminal for Option A.
 
 In the [Temporal Web UI](http://localhost:8233), find `agent-42`. Read the events:
@@ -275,104 +300,84 @@ In the [Temporal Web UI](http://localhost:8233), find `agent-42`. Read the event
 timer, and the Worker identity on the Workflow Tasks.
 
 """ + lab_text[end:])
-    body = md_to_html(lab_text, name)
-    body += ('<h2>Files in this lab</h2><ul>'
+    title, goal, exercise = readme_intro(lab_text)
+    reading = md_to_html(exercise, name)
+    reading += ('<h2>Files in this lab</h2><ul>'
              + "".join(f"<li><code>{html.escape(f)}</code></li>" for f in files) + "</ul>")
-    body = console_panel(name, d) + body
+    toc = ''.join(f'<a href="#{heading_id(line[3:].strip())}">{html.escape(line[3:].strip())}</a>'
+                  for line in exercise.splitlines() if line.startswith('## '))
+    hero = (f'<section class="hero"><span class="eyebrow">LAB {name[:2]} / 11</span>'
+            f'<h1>{html.escape(title)}</h1><p>{html.escape(goal)}</p></section>')
+    body = (hero + console_panel(name, d) + '<div class="reading-layout" id="exercise">'
+            f'<aside class="toc"><h2>On this page</h2>{toc}</aside>'
+            f'<article class="lab-reading">{reading}</article></div>')
     idx = [p.name for p in LABS].index(name)
     nav = ""
     if idx:
         nav += f'<a href="/lab/{LABS[idx-1].name}">← previous</a>'
     if idx + 1 < len(LABS):
         nav += f'<a href="/lab/{LABS[idx+1].name}">next →</a>'
-    return shell(name, body, nav)
+    return shell(title, body, nav, name)
 
 
 def console_panel(name: str, d: Path) -> str:
-    """The part a terminal usually does: prepare the env, start a Worker, kill it, run the starter.
-
-    Every button is a Python snippet the runtime executes in this lab's own virtualenv. The Worker
-    is a detached child process of the kernel, so `kill -9` from this page is the same signal the
-    lab asks you to send from a second terminal.
-    """
+    '''Per-lab browser controls backed by the runtime's Python environment.'''
     lab_dir, labs_root = str(d), str(ROOT)
-    queue = f"lab-{name[:2]}"
-    prepare = (
-        "import subprocess, sys, os\n"
-        f"os.chdir({lab_dir!r})\n"
-        "globals()['WORKER_LOG_OFFSET'] = os.path.getsize('worker.out') if os.path.exists('worker.out') else 0\n"
-        f"sys.path[:0] = [{lab_dir!r}, {labs_root!r}]\n"
-        f"os.environ['TASK_QUEUE'] = {queue!r}\n"
-        "print(subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', '-r',\n"
-        f"    os.path.join({labs_root!r}, 'requirements.txt')], capture_output=True, text=True).stderr[-400:])\n"
-        "import temporalio; print('temporalio', temporalio.__version__ if hasattr(temporalio,'__version__') else 'ready')\n"
-        f"print('cwd', os.getcwd(), '| TASK_QUEUE', os.environ['TASK_QUEUE'])"
-    )
-    worker = (
-        "import subprocess, sys, os, time\n"
-        "WORKER = globals().get('WORKER')\n"
-        "if WORKER and WORKER.poll() is None: print('worker already running, pid', WORKER.pid)\n"
-        "else:\n"
-        "    WORKER = subprocess.Popen([sys.executable, 'worker.py'], cwd=os.getcwd(),\n"
-        "        env={**os.environ, 'PYTHONUNBUFFERED':'1'},\n"
-        "        stdout=open('worker.out','ab'), stderr=subprocess.STDOUT, start_new_session=True)\n"
-        "    globals()['WORKER'] = WORKER; time.sleep(2)\n"
-        "    print('worker pid', WORKER.pid, '| alive' if WORKER.poll() is None else '| died, see worker.out')"
-    )
-    kill = (
-        "import os, signal, time\n"
-        "W = globals().get('WORKER')\n"
-        "if not W or W.poll() is not None: print('no worker running')\n"
-        "else:\n"
-        "    os.kill(W.pid, signal.SIGKILL); time.sleep(1)\n"
-        "    print('SIGKILL sent to', W.pid, '| exit code', W.poll())"
-    )
-    starter = (
-        "import subprocess, sys, os\n"
-        "STARTER = globals().get('STARTER')\n"
-        "if STARTER and STARTER.poll() is None: print('starter already running, pid', STARTER.pid)\n"
-        "else:\n"
-        "    STARTER = subprocess.Popen([sys.executable, 'starter.py'], cwd=os.getcwd(),\n"
-        "        env={**os.environ, 'PYTHONUNBUFFERED':'1'},\n"
-        "        stdout=open('starter.out','wb'), stderr=subprocess.STDOUT, start_new_session=True)\n"
-        "    globals()['STARTER'] = STARTER\n"
-        "    print('starter pid', STARTER.pid, '| see Starter output for progress and result')"
-    )
-    tail = (
-        "if os.path.exists('worker.out'):\n"
-        "    with open('worker.out', 'rb') as f:\n"
-        "        f.seek(globals().get('WORKER_LOG_OFFSET', 0))\n"
-        "        print(f.read()[-3000:].decode(errors='replace') or 'no worker output yet')\n"
-        "else: print('no worker output yet')"
-    )
-    starter_tail = (
-        "print(open('starter.out').read()[-3000:] if os.path.exists('starter.out') else 'no starter output yet')"
-    )
-    def b(label, code, primary=False):
-        cls = "run primary" if primary else "run"
-        return f'<button class="{cls}" data-inline="{html.escape(code)}">{label}</button>'
-    return f"""<div class="panel">
-<h2>Run it here</h2>
-<p class="hint">With Option A already set up, use these buttons for this lab. <strong>Prepare this
-lab</strong> installs its Python packages and sets its Task Queue; then start the Worker and run the
-starter. The starter runs in the background so you can kill the Worker while its timer is pending.
-Use <strong>Starter output</strong> to see its progress and result. The kill button sends
-<code>SIGKILL</code> to the Worker. Terminal commands in the exercise below describe Option B.</p>
-<div class="btns" data-lab="{html.escape(name)}">
-  {b("1 · Prepare this lab", prepare, True)}
-  {b("2 · Start Worker", worker)}
-  {b("3 · Run starter.py", starter)}
-  {b("kill -9 the Worker", kill)}
-  {b("Worker output", tail)}
-  {b("Starter output", starter_tail)}
-</div>
-<div class="out" id="out-panel" hidden></div>
-<details><summary>Python console</summary>
+    prefix = f"import sys\nsys.path.insert(0, {labs_root!r})\nimport browser_runner as br\n"
+
+    def code(call: str) -> str:
+        return prefix + f"print(br.{call})"
+
+    def button(label: str, snippet: str, cls: str = "") -> str:
+        return (f'<button type="button" class="run {cls}" data-inline="{html.escape(snippet, quote=True)}">'
+                f'{html.escape(label)}</button>')
+
+    cards = []
+    for item in LAB_ACTIONS[name[:2]]:
+        key = str(item["key"])
+        title = str(item["title"])
+        args = list(item["args"])
+        env = dict(item["env"])
+        command = "python " + " ".join(args)
+        kind = "Worker" if item["kind"] == "worker" else "Command"
+        launch = button("Run", code(f"start({key!r}, {title!r}, {args!r}, {env!r})"), "launch")
+        output = button("Output", code(f"output({key!r})"), "view-output")
+        method = "kill" if kind == "Worker" else "stop"
+        stop = button("Crash Worker" if kind == "Worker" else "Stop", code(f"{method}({key!r})"), "danger")
+        cards.append(f'''<article class="action-card" data-key="{html.escape(key)}">
+<div class="action-meta">{kind}</div><h3>{html.escape(title)}</h3>
+<p>{html.escape(str(item["detail"]))}</p><code>{html.escape(command)}</code>
+<div class="action-buttons">{launch}{output}{stop}</div></article>''')
+
+    setup = code(f"prepare({lab_dir!r}, {labs_root!r}, {base_env(name)!r})")
+    status = code("status()")
+    return f'''<section class="lab-workspace" aria-labelledby="workspace-heading">
+<div class="workspace-heading"><div><span class="eyebrow">BROWSER WORKSPACE</span>
+<h2 id="workspace-heading">Run this lab</h2>
+<p>Use the controls here if you chose Option A. Each command uses this lab's directory and Python
+ environment. Commands launch in the background, so you can inspect history or crash a Worker while
+ a run is active. <a href="#exercise">Read the exercise ↓</a></p></div></div>
+<div class="setup-step"><span class="step-number">1</span><div><h3>Prepare</h3>
+<p>Install this lab's packages and set its Task Queue. Temporal and the runtime should say ready above.</p>
+{button("Prepare this lab", setup, "primary")}{button("Process status", status)}</div></div>
+<div class="workspace-subhead"><span class="step-number">2</span><div><h3>Run and observe</h3>
+<p>Choose a starting point below. Open Output to follow the process; Crash Worker sends SIGKILL.</p></div></div>
+<div class="action-grid">{''.join(cards)}</div>
+<div class="command-box"><h3>Run another command from the exercise</h3>
+<p>Paste one Python command from this lab, such as <code>python history.py agent-42</code>.
+Arguments and lab-specific environment variables work here. Each command gets its own output log.</p>
+<div class="command-row"><input id="lab-command" aria-label="Python command" spellcheck="false"
+placeholder="python starter.py --no-wait"><button type="button" class="run primary" id="command-run">Run command</button></div>
+<div id="command-history" class="command-history"></div></div>
+<div class="output-heading"><h3>Output</h3><span id="output-name">Select an action to see its output</span></div>
+<pre class="out" id="out-panel" aria-live="polite">No action selected yet.</pre>
+<details class="console-details"><summary>Advanced: Python console</summary>
+<p>Run Python in this lab's runtime kernel. Use the cards or command field for scripts.</p>
 <textarea id="console" rows="4" spellcheck="false"
-  placeholder="from common import connect, show_history&#10;await show_history(await connect(), 'agent-42')"></textarea>
-<button class="run" id="console-run">Run</button>
-<div class="out" id="out-console" hidden></div></details>
-</div>"""
+placeholder="from common import connect, show_history&#10;await show_history(await connect(), 'agent-42')"></textarea>
+<button type="button" class="run" id="console-run">Run Python</button>
+<pre class="out" id="out-console" hidden></pre></details>
+</section>'''
 
 
 class Handler(BaseHTTPRequestHandler):

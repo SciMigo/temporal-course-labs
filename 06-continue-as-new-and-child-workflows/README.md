@@ -3,6 +3,9 @@
 Goal: keep AgentRun's history bounded without losing its identity, and delegate a research task to
 a Child Workflow that has a history — and a Worker — of its own.
 
+
+**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/06-continue-as-new-and-child-workflows), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
+
 Same program as lab 5 plus two things in `workflows.py`: the continue-as-new check at the top of
 the loop, with `AgentState` as the checkpoint, and a `research` step that `plan()` hands to
 `ResearchAgent`. Reading page: "Continue-As-New and Child Workflows".
@@ -203,3 +206,16 @@ the note and the dedupe set travelling in `AgentState`, `status()` answering on 
 runs, the child's steps in the child's history and one Initiated/Started/Completed triple in the
 parent's, and a failing child surfacing as `CHILD_WORKFLOW_EXECUTION_FAILED` that the parent
 catches and keeps going after.
+
+## What you learned
+
+- Continue-as-new closes one Run and starts another under the same Workflow ID with an explicit state snapshot.
+- A Child Workflow has its own history and can run on a separate Task Queue and Worker.
+- The parent records the child's lifecycle; it does not absorb the child's internal Events.
+
+## Questions to answer
+
+1. Which fields must `AgentState` carry into the next Run to preserve behavior and deduplication?
+2. How can one Workflow ID have several Run IDs without one unbounded Event History?
+3. What changes in the parent history when the Research Worker dies?
+4. Why does recovering the parent not require replaying the child's history inside the parent?

@@ -6,6 +6,9 @@ reading history: a Signal is durable even when no Worker exists, a Query and a r
 leave nothing behind, a message delivered twice is applied once, and a handler that is still
 awaiting an Activity when the run ends is lost unless the main loop drains it first.
 
+
+**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/05-signals-queries-updates), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
+
 Same program as labs 1–4. The one new line that matters is the first line of the loop in
 `workflows.py`: `await workflow.wait_condition(lambda: not self.paused or self.status != "running")`.
 Reading page: "Signals, Queries, and Updates".
@@ -234,3 +237,16 @@ pause holds across ten skipped minutes, the rejected Update leaves no Update Eve
 Update returns the same goal without a second write, the retried Signal is recorded twice and
 applied once, and a continue-as-new under a live handler loses it without the drain and keeps it
 with the drain.
+
+## What you learned
+
+- Signals are recorded by the Service even when the Worker is absent; Queries need a Worker and do not add history.
+- An Update validator can reject a request before it is recorded, while a handler can deduplicate a retried command ID.
+- A handler still awaiting an Activity must be drained before continue-as-new closes its run.
+
+## Questions to answer
+
+1. Which control operation still succeeds with every Worker stopped, and where is it recorded?
+2. Why does `status` time out without a Worker while `resume` returns?
+3. What appears in history for a rejected `change_goal` Update?
+4. What state must be carried across continue-as-new so retried commands remain idempotent?

@@ -9,11 +9,10 @@ look at the result, repeat) whose parts have fixed names — `plan()` decides in
 same file. Reading page: "The program this course builds".
 
 ## 1.1 Bring it up
-**Option A — local page:** Click **Prepare this lab**, **Start Worker**, then **Run starter.py** in
-the panel above. These buttons install the lab's Python packages, set `TASK_QUEUE=lab-01`, and use the
-right working directory. The starter runs in the background while you do the crash experiment;
-click **Starter output** to see its progress and eventual result. Do not run the terminal commands
-below.
+**Option A — local page:** Click **Prepare this lab**, then **Run** on the Worker and Start agent-42
+cards above. The page installs the lab's packages, sets `TASK_QUEUE=lab-01`, and uses the right
+working directory. The starter runs in the background while you do the crash experiment; click
+**Output** on its card to see progress and the eventual result. Do not run the terminal commands below.
 
 **Option B — terminals:** Leave the Temporal dev server from the course setup running. In the
 `temporal-course-labs` directory, create a virtual environment with Python 3.11 or newer, install
@@ -64,14 +63,14 @@ lives while no process is running it. So do not restart anything yet.
 4. Note what did *not* happen: the Workflow did not fail, did not roll back, and did not finish. It
    is Running, with a Workflow Task scheduled and nobody to take it. The timer has already fired, so
    the execution is no longer waiting for time. It is waiting for compute.
-5. Now click **Start Worker** again (Option A), or run `../.venv/bin/python worker.py` in the Lab 1
+5. Now click **Run** on the Worker card again (Option A), or run `../.venv/bin/python worker.py` in the Lab 1
    directory (Option B). The new Worker takes that waiting task, replays, and the Workflow
    completes: `WorkflowTaskStarted`, `WorkflowTaskCompleted`, `WorkflowExecutionCompleted`. Note the
    identity on the last Workflow Task — a different process from the one you killed.
 6. Count the `call_llm key=...` log lines across both Worker terminals (the killed Worker's output is
-   still on screen; on the local lab page, **Worker output** shows both). There is exactly one, and it
+   still on screen; on the local lab page, the Worker's **Output** shows both). There is exactly one, and it
    came from the Worker you killed. Yet the new Worker finished `AgentRun`, and `starter.py` printed
-   the model's answer as the result (see **Starter output** on the local page). The new process never called the model, and it ran
+   the model's answer as the result (see the starter card's **Output** on the local page). The new process never called the model, and it ran
    `self.context_summary = answer` all the same. Where did `answer` come from?
 
 Which events prove the Service was making progress while your application compute was absent? (12
@@ -122,7 +121,13 @@ Workflows it runs, and the Service prefers to send their next Task back to it; m
 *sticky execution*. It is a caching optimization, not what makes the Workflow durable: the Worker
 that takes over has no cache, and it rebuilds the state by replay.
 
-## Done when
+## What you learned
+
+- Temporal keeps the Event History and durable timer while no Worker is running.
+- A new Worker rebuilds Workflow state by replaying code against recorded Events; it does not restore a Python stack.
+- A completed Activity result is read from history during replay, so the model call does not run again.
+
+## Questions to answer
 You can answer all four without looking anything up:
 
 1. Why can `starter.py` exit while the Workflow keeps existing?

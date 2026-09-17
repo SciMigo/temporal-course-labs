@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>%%TITLE%% · Temporal labs</title>
+<style>
+:root{color-scheme:light;--bg:#f5f7f8;--surface:#fff;--surface2:#eef4f4;--ink:#17272b;--muted:#51646b;--line:#d6e0e2;--accent:#006d77;--accent-dark:#00535c;--danger:#a3362e;--ok:#19815a;--code:#eef2f3;--shadow:0 10px 30px rgba(28,58,64,.07)}
+@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#101c20;--surface:#17262b;--surface2:#1c3338;--ink:#e9f1f2;--muted:#aec1c5;--line:#385057;--accent:#71d5d8;--accent-dark:#9ce9e9;--danger:#ff958b;--ok:#65d6a5;--code:#203238;--shadow:0 10px 30px rgba(0,0,0,.2)}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.58 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:var(--accent)}button,input,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}code,pre{font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}code{overflow-wrap:anywhere}p code,li code,td code{background:var(--code);border-radius:4px;padding:.08em .3em}
+.site-header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--surface) 95%,transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.header-inner{max-width:1250px;margin:auto;padding:.7rem 1.3rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}.brand{font-weight:800;letter-spacing:-.02em;text-decoration:none;color:var(--ink);white-space:nowrap}.brand-mark{display:inline-grid;place-items:center;width:1.8rem;height:1.8rem;margin-right:.45rem;border-radius:7px;background:var(--accent);color:var(--surface);font-size:.9rem}.nav-links{display:flex;gap:.8rem;align-items:center;margin-left:auto}.nav-links a{text-decoration:none;font-size:.88rem;font-weight:650}.status{display:flex;gap:.45rem;flex-wrap:wrap;width:100%;margin-top:.1rem}.status-pill{display:inline-flex;align-items:center;gap:.4rem;padding:.2rem .55rem;border:1px solid var(--line);border-radius:999px;font-size:.78rem;color:var(--muted)}.dot{width:.48rem;height:.48rem;border-radius:50%;background:var(--danger)}.dot.up{background:var(--ok)}.status-pill a{text-decoration:none;font-weight:650}
+.wrap{max-width:1250px;margin:0 auto;padding:1.5rem 1.3rem 5rem}.hero{padding:2rem 2.2rem;border-radius:18px;background:linear-gradient(125deg,#123c45,#0b6570);color:#fff;box-shadow:var(--shadow);margin:0 0 1.5rem}.hero .eyebrow{color:#a8e3df}.hero h1{margin:.35rem 0;font-size:clamp(2rem,4vw,3.35rem);line-height:1.13;letter-spacing:-.045em}.hero p{max-width:75ch;color:#e0eff0;font-size:1.05rem;margin:.7rem 0 0}.eyebrow{font-size:.7rem;font-weight:800;letter-spacing:.14em;color:var(--accent)}h2,h3{line-height:1.25;letter-spacing:-.025em}h2{font-size:1.55rem}h3{font-size:1.05rem}.warn{padding:1rem 1.2rem;border:1px solid var(--danger);border-radius:12px;background:var(--surface);margin-bottom:1rem}
+.lab-workspace{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:1.5rem;margin-bottom:2rem}.workspace-heading h2{margin:.25rem 0}.workspace-heading p{max-width:78ch;margin:.4rem 0 1.2rem;color:var(--muted)}.setup-step,.workspace-subhead{display:flex;gap:1rem;align-items:flex-start}.setup-step{border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:1rem;margin-bottom:1.4rem}.setup-step h3,.workspace-subhead h3{margin:0}.setup-step p,.workspace-subhead p{margin:.25rem 0 .75rem;color:var(--muted);font-size:.91rem}.step-number{flex:0 0 1.8rem;height:1.8rem;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--surface);font-size:.84rem;font-weight:800}.action-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:.8rem;margin:1rem 0 1.4rem}.action-card{border:1px solid var(--line);border-radius:12px;padding:1rem;background:var(--surface);display:flex;flex-direction:column;min-height:190px}.action-card h3{margin:.2rem 0}.action-card p{font-size:.85rem;color:var(--muted);margin:.3rem 0 .7rem}.action-card>code{display:block;margin-top:auto;padding:.4rem .55rem;border-radius:6px;background:var(--code);font-size:.75rem}.action-meta{color:var(--accent);font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.action-buttons{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.7rem}.run,.copy{border:1px solid var(--line);background:var(--surface);color:var(--accent);border-radius:7px;padding:.43rem .7rem;font-size:.84rem;font-weight:700;line-height:1.2}.run:hover,.copy:hover{border-color:var(--accent);background:var(--surface2)}.run.primary{background:var(--accent);color:var(--surface);border-color:var(--accent);margin-right:.5rem}.run.primary:hover{background:var(--accent-dark)}.run.danger{color:var(--danger)}.command-box{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:1rem;margin-bottom:1.2rem}.command-box h3{margin:.1rem 0}.command-box p{color:var(--muted);font-size:.88rem;margin:.35rem 0 .8rem}.command-row{display:flex;gap:.5rem}.command-row input{flex:1;min-width:0;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink);padding:.5rem .7rem;font:13px ui-monospace,SFMono-Regular,Menlo,monospace}.command-history{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.55rem}.command-history:empty{display:none}.command-history button{font-size:.75rem}.output-heading{display:flex;gap:.8rem;align-items:baseline;flex-wrap:wrap}.output-heading h3{margin:.2rem 0 .5rem}.output-heading span{color:var(--muted);font-size:.8rem}.out{white-space:pre-wrap;overflow:auto;max-height:390px;min-height:65px;background:#102428;color:#e0f0ee;border-radius:10px;padding:.8rem 1rem;margin:0;font-size:.8rem}.out.err{border:2px solid var(--danger)}.console-details{margin-top:1rem;border-top:1px solid var(--line);padding-top:.7rem}.console-details summary{cursor:pointer;color:var(--accent);font-weight:700}.console-details p{color:var(--muted);font-size:.85rem}.console-details textarea{width:100%;padding:.75rem;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}.console-details .out{margin-top:.6rem}
+.reading-layout{display:grid;grid-template-columns:215px minmax(0,1fr);gap:1.4rem;align-items:start}.toc{position:sticky;top:7.3rem;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem;max-height:calc(100vh - 8rem);overflow:auto}.toc h2{font-size:.77rem;letter-spacing:.12em;color:var(--muted);margin:0 0 .6rem;text-transform:uppercase}.toc a{display:block;text-decoration:none;font-size:.82rem;padding:.35rem .2rem;color:var(--muted);border-left:2px solid transparent}.toc a:hover{color:var(--accent);border-color:var(--accent)}.lab-reading{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:1.2rem 1.5rem}.lab-reading h2{scroll-margin-top:7.5rem;border-top:1px solid var(--line);padding-top:1.4rem;margin-top:2.2rem}.lab-reading h2:first-child{border:0;margin-top:0;padding-top:0}.lab-reading h3{scroll-margin-top:7.5rem}.lab-reading p,.lab-reading li{max-width:80ch}.lab-reading li{margin:.35rem 0}.lab-reading pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:.8rem;overflow:auto}.lab-reading table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;font-size:.88rem}.lab-reading th,.lab-reading td{border:1px solid var(--line);padding:.5rem .7rem;text-align:left;vertical-align:top}.lab-reading blockquote{border-left:3px solid var(--accent);padding:.35rem .9rem;background:var(--surface2);margin:1rem 0}.code{margin:.9rem 0 1.3rem}.code .copy{margin-top:.4rem}.index-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:.8rem;list-style:none;padding:0}.index-card{display:block;height:100%;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem;text-decoration:none;color:var(--ink)}.index-card:hover{border-color:var(--accent);box-shadow:var(--shadow)}.index-card strong{display:block;font-size:1.07rem;margin:.25rem 0}.index-card p{font-size:.85rem;color:var(--muted);margin:.3rem 0}.index-card .eyebrow{font-size:.67rem}
+@media(max-width:850px){.reading-layout{display:block}.toc{position:static;max-height:180px;margin-bottom:1rem}.lab-reading{padding:1rem}.hero{padding:1.5rem}.wrap{padding:1rem 1rem 3rem}}@media(max-width:560px){.header-inner{gap:.5rem}.nav-links{margin-left:0}.command-row{flex-direction:column}.action-grid{grid-template-columns:1fr}.hero h1{font-size:2rem}}
+#exercise{scroll-margin-top:7.5rem}.lab-reading h2[id="what-you-learned"],.lab-reading h2[id="questions-to-answer"]{color:var(--accent);border-top:2px solid var(--accent)}.lab-reading h2[id="what-you-learned"]+ul,.lab-reading h2[id="questions-to-answer"]+ol{background:var(--surface2);border-radius:10px;padding:1rem 1rem 1rem 2.3rem}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="header-inner">
+<a class="brand" href="/"><span class="brand-mark">T</span>Temporal labs</a>
+<div class="nav-links">%%NAV%%</div>
+<div class="status">
+<span class="status-pill"><span class="dot %%RT_CLASS%%"></span>Runtime :9477 %%RT_TEXT%%</span>
+<span class="status-pill"><span class="dot %%TP_CLASS%%"></span>Temporal :7233 %%TP_TEXT%%</span>
+<span class="status-pill"><a href="http://localhost:8233" target="_blank" rel="noopener">Open Temporal UI ↗</a></span>
+</div></div></header>
+<div class="wrap">%%BANNER%%%%BODY%%</div>
+<script>
+const RT = %%RUNTIME_JSON%%;
+const LAB = %%LAB_JSON%%;
+const ROOT_PATH = %%ROOT_JSON%%;
+let busy = false;
+let activeOutput = null;
+let activeName = '';
+async function post(code, timeoutMs=20000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(RT + '/cell/run', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({lab_id:LAB,code}), signal:controller.signal
+    });
+    return {status:response.status, json:await response.json().catch(() => null)};
+  } finally { clearTimeout(timer); }
+}
+function resultText(response) {
+  if (response.status !== 200) return {text:'Runtime error '+response.status+': '+(response.json?.detail || 'Check the runtime terminal.'),error:true};
+  const data = response.json || {};
+  const parts = (data.outputs || []).map(output => {
+    const content = output.content || output;
+    return content.text || content.data?.['text/plain'] || (content.ename ? content.ename+': '+content.evalue : '');
+  }).filter(Boolean);
+  if (data.error) parts.push(data.error.ename+': '+data.error.evalue);
+  return {text:parts.join('\n') || '(no output)',error:!data.success};
+}
+async function runCode(code, target=document.getElementById('out-panel'), quiet=false, timeoutMs=20000) {
+  if (!LAB || busy) return null;
+  busy=true;
+  if (!quiet) { target.textContent='Working…'; target.classList.remove('err'); }
+  if (!quiet) document.querySelectorAll('button.run').forEach(button => button.disabled=true);
+  try {
+    const result = resultText(await post(code,timeoutMs));
+    target.textContent=result.text;
+    target.classList.toggle('err',result.error);
+    if (quiet && /exited · code/.test(result.text)) {
+      activeOutput=null;
+      const label=document.getElementById('output-name'); if (label) label.textContent=activeName+' · finished';
+    }
+    return result;
+  } catch (error) {
+    target.textContent='Could not finish the request. Check that Agent Runtime is running on :9477. '+error;
+    target.classList.add('err');
+    return {text:target.textContent,error:true};
+  } finally {
+    busy=false;
+    if (!quiet) document.querySelectorAll('button.run').forEach(button => button.disabled=false);
+  }
+}
+function commandCode(method,key) {
+  return 'import sys\nsys.path.insert(0, '+JSON.stringify(ROOT_PATH)+')\nimport browser_runner as br\nprint(br.'+method+'('+JSON.stringify(key)+'))';
+}
+function watch(code,name) {
+  activeOutput=code; activeName=name;
+  const label=document.getElementById('output-name'); if (label) label.textContent=name+' · updates every 3 seconds';
+}
+setInterval(() => {
+  if (activeOutput && !busy && document.visibilityState==='visible') runCode(activeOutput,document.getElementById('out-panel'),true);
+},3000);
+document.addEventListener('click', async event => {
+  const copy=event.target.closest('button.copy');
+  if (copy) {
+    await navigator.clipboard.writeText(copy.closest('.code').querySelector('code').textContent);
+    copy.textContent='Copied'; setTimeout(() => copy.textContent='Copy',1200); return;
+  }
+  const button=event.target.closest('button.run'); if (!button) return;
+  while (busy) await new Promise(resolve => setTimeout(resolve,50));
+  if (button.id==='console-run') {
+    const output=document.getElementById('out-console'); output.hidden=false;
+    await runCode(document.getElementById('console').value,output);
+    return;
+  }
+  if (button.id==='command-run') {
+    const raw=document.getElementById('lab-command').value.trim(); if (!raw) return;
+    activeOutput=null;
+    const code=commandCode('run_command',raw);
+    const result=await runCode(code);
+    if (result && !result.error && /^command-\d+\n/.test(result.text)) {
+      const key=result.text.split('\n')[0];
+      const row=document.createElement('div');
+      const out=document.createElement('button'); out.className='run'; out.textContent='Output · '+key;
+      out.dataset.inline=commandCode('output',key); out.dataset.watch=key;
+      const workerCommand=/\bworker(?:_[a-z]+)?\.py\b/.test(raw);
+      const stop=document.createElement('button'); stop.className='run danger';
+      stop.textContent=workerCommand?'Crash Worker':'Stop';
+      stop.dataset.inline=commandCode(workerCommand?'kill':'stop',key);
+      row.append(out,stop); document.getElementById('command-history').prepend(row);
+      watch(out.dataset.inline,raw);
+    }
+    return;
+  }
+  if (button.dataset.inline === undefined) return;
+  if (!button.classList.contains('launch') && !button.classList.contains('view-output')) activeOutput=null;
+  const result=await runCode(button.dataset.inline,document.getElementById('out-panel'),false,button.classList.contains('primary')?180000:20000);
+  const card=button.closest('.action-card');
+  if (card && result && !result.error) {
+    if (button.classList.contains('launch')) {
+      const output=card.querySelector('.view-output'); watch(output.dataset.inline,card.querySelector('h3').textContent);
+    } else if (button.classList.contains('view-output')) watch(button.dataset.inline,card.querySelector('h3').textContent);
+  } else if (button.dataset.watch) watch(button.dataset.inline,button.dataset.watch);
+});
+document.getElementById('lab-command')?.addEventListener('keydown',event => {
+  if (event.key==='Enter') {event.preventDefault();document.getElementById('command-run').click();}
+});
+</script>
+</body>
+</html>

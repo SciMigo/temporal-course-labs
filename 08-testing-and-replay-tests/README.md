@@ -4,6 +4,9 @@ Goal: test `AgentRun` three ways — Workflow tests in the time-skipping environ
 tests with a fake context, and replay tests over recorded histories — then inject failures on
 purpose, and finally read a broken history with no source and say what happened.
 
+
+**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/08-testing-and-replay-tests), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
+
 `workflows.py` is AgentRun at stage 8: the loop from labs 1–7 (`plan()`, `call_llm`,
 `execute_tool` with timeouts / RetryPolicy / heartbeats / idempotency key, the L05 Signals,
 Query and Update, the L06 snapshot and continue-as-new, the L07 compensation list). No real
@@ -267,3 +270,16 @@ In the time-skipping environment the rule is unchanged: the test server holds th
 mocked Activities leave recorded results, not effects. A replay test *is* a Worker coming back
 — against a file, in CI, before any real Worker sees the new code. The forensic history is the
 whole of what survived; the five questions are what a returning Worker will do with it.
+
+## What you learned
+
+- Time-skipping tests check Workflow decisions quickly; Activity tests check effects with a fake context.
+- Replay tests detect incompatible Workflow code against saved real histories before deployment.
+- A history can show what Temporal recorded, but it cannot prove whether an external effect happened.
+
+## Questions to answer
+
+1. Which test would catch a changed command order in a months-old run before deployment?
+2. Why does a mocked Activity result survive replay while the mock itself does not run again?
+3. In the forensic history, what can you infer about Worker crashes, retries, and the missing external effect?
+4. Which part of the failure-injection suite requires real waiting instead of time skipping?

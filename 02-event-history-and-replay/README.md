@@ -4,6 +4,9 @@ Goal: read the real history of lab 1's `AgentRun` event by event, predict what t
 append next, hand the execution from one Worker to another and diff what each one saw, then replay
 a history by hand and check yourself against the SDK.
 
+
+**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/02-event-history-and-replay), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
+
 The program is unchanged from lab 1 (`plan()` → `call_llm` → 20 s timer → finish). Two
 instruments were added to `workflows.py`: a `CALL_LLM_INVOCATIONS` counter inside the Activity,
 and `workflow.logger` lines before every `await` — the SDK suppresses those during replay, so the
@@ -201,3 +204,16 @@ needs the process to die in the milliseconds between `WorkflowTaskStarted` and
 
 Blocking calls inside Workflow code are lab 3's subject. There they are the determinism rule; here
 they are a footnote.
+
+## What you learned
+
+- The Event History records commands and results; replay follows it until the Worker reaches new work.
+- A Worker handoff may add Workflow Task timeout and reschedule Events without repeating a completed Activity.
+- Event IDs, task identities, and Activity attempts let you explain exactly what ran before and after a crash.
+
+## Questions to answer
+
+1. Which Event contains the model answer that the second Worker receives during replay?
+2. What history change tells you a timer fired while no Worker was polling?
+3. Why can two Workers run the same Workflow code without making two model calls?
+4. What is the difference between a Workflow Task retry and an Activity retry in the history?

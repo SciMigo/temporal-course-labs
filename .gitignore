@@ -5,4 +5,5 @@
 .state/
 temporal-data/
 worker.out
+.browser-runs/
 .ipynb_checkpoints/

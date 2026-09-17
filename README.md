@@ -9,8 +9,8 @@ Each lab kills something on purpose — a Worker, a Task Queue, a deploy, a tena
 then asks you to explain what survived and why.
 
 Choose the [terminal walkthrough](#on-a-macbook-start-to-finish) or the
-[local page](#or-run-them-from-a-local-page) to start Lab 1. The local page handles the lab's Python
-environment and Task Queue for you.
+[local page](#or-run-them-from-a-local-page). The local page handles each lab's Python environment,
+Task Queue, process output, and Worker crashes for you.
 
 The Worker runs on your machine, not in the container, so you can `kill -9` it from a second
 terminal while watching the Web UI. That action is the day-one lesson.
@@ -160,17 +160,24 @@ Then open **http://127.0.0.1:3000/** (HTTP, not HTTPS), exactly as printed by th
 browser adds `/en`, the lab server accepts that path too. The strip at the top of every page shows
 whether the runtime and Temporal are up.
 
-Each lab gets a page with the exercise text and a **Run it here** panel: prepare this lab's
-virtualenv, start the Worker, run `starter.py`, and `kill -9` the Worker — the same signal the lab
-asks you to send from a second terminal, sent from a button. There is also a Python console scoped to
-the lab's directory.
+Each lab has its own **Run this lab** workspace. Click **Prepare this lab** once, then use the cards
+for that lab's Worker roles, scripts, or tests. Every launch returns immediately; **Output** updates
+while the process runs. **Crash Worker** sends SIGKILL, so you can leave the Worker dead while
+Temporal continues. For a variation in the exercise, paste one `python ...` command into **Run
+another command**. The page uses the lab's directory and Python environment and saves output under
+that lab's ignored `.browser-runs/` directory. The advanced Python console shares the same kernel.
+
+The cards cover the main path through each lab. Python scripts and `python -m pytest` variations
+work in the command field, including leading environment settings such as
+`LAB03_BREAK=clock python worker.py`. Shell pipelines and Docker administration commands in the
+terminal examples remain terminal commands.
 
 The runtime trusts loopback origins on any port: no token to paste and no pairing prompt. Both ends
 are on loopback, so nothing is exposed off your machine. If port 3000 is in use, run
 `python3 lab_server.py --port 3001` and open `http://127.0.0.1:3001/`.
 
-Without the runtime the pages are still the lab text, with copy buttons on every command. The
-terminal path in this README works exactly as written; the page is the same thing without a terminal.
+Without the runtime the pages still show the exercise text and copy buttons. The terminal path in
+this README remains available.
 
 ## The labs
 
@@ -190,11 +197,10 @@ terminal path in this README works exactly as written; the page is the same thin
 
 ## Conventions
 
-`worker.py` registers that module's Workflows and Activities on task queue `lab-NN`; `starter.py`
-starts an execution with a fixed Workflow ID so you can find it in the UI; `README.md` is the
-exercise text; `tests/` is what you run to check yourself. Set `TASK_QUEUE` in **every** terminal of
-a lab — a Worker and a Client on different queues wait for each other forever, with no error
-anywhere.
+Most labs use `worker.py` and `starter.py`; labs 10 and 11 split Workers into Workflow, CPU, and GPU
+pools. `README.md` is the exercise text and `tests/` is what you run to check yourself. The browser
+workspace sets each lab's queue and required prefix. In the terminal path, set `TASK_QUEUE` in
+**every** terminal of a lab — a Worker and a Client on different queues wait for each other forever.
 
 Common helpers in `common/`: `connect()` reads `TEMPORAL_ADDRESS` (default `localhost:7233`), and
 `show_history(workflow_id)` prints the event list the way the labs annotate it.
@@ -219,10 +225,9 @@ reading histories and running tests, which is what cells are good at.
 pip install jupyterlab && jupyter lab      # then open the lab's .ipynb
 ```
 
-The other seven labs stay terminal-first on purpose. They run Workers across two to five terminals
-and ask you to kill them mid-flight; a single kernel is the wrong shape for that, and pretending
-otherwise would hide the lesson. Where a notebook cell would have started something long-lived, the
-notebook says so and leaves the command for a terminal.
+The other labs use the local browser workspace or terminals for their long-lived Workers. Notebook
+cells are still useful for history inspection and tests; the browser workspace provides the
+separate process controls needed for crash experiments.
 
 The `README.md` in each lab is the source of truth. The notebooks are generated from it with
 [jupytext](https://jupytext.readthedocs.io) — `python3 tools/make_notebooks.py` — so the two cannot

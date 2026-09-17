@@ -6,6 +6,9 @@ into state). Ship it three ways: fail the replay test and patch (9.1), run v1 an
 side by side with Worker Versioning (9.2), and let a pinned agent upgrade at its next
 continue-as-new (9.3).
 
+
+**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/09-deploying-changed-workflow-code), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
+
 ```
 labs/09-deploying-changed-workflow-code/
   workflows.py                 v1 — lab 8's AgentRun + the continue-as-new upgrade point; NO verify step
@@ -256,3 +259,16 @@ continues cleanly. With versioning: the Service routes a pinned execution's task
 Worker; if none returns, the task waits — that is the recovery page. With neither: a v2 Worker
 replays, fails the Workflow Task with the error in the 9.1 matrix, and the execution stalls
 until code and history agree again.
+
+## What you learned
+
+- A patch marker lets old histories take the old branch while new runs use changed Workflow code.
+- Worker Versioning routes pinned executions to compatible builds; routing alone does not make incompatible code replayable.
+- Continue-as-new gives a long-lived agent a controlled upgrade point with a fresh history.
+
+## Questions to answer
+
+1. What does `workflow.patched()` return when replaying a history with no patch marker?
+2. What happens to a pinned v1 execution if every v1 Worker disappears?
+3. Why is sending an old run straight to naive v2 unsafe even if v2 is the current deployment?
+4. At what boundary can the long-lived agent move to a new build without replaying its old history there?

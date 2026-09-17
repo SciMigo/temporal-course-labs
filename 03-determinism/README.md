@@ -5,6 +5,9 @@ each, read the error the SDK gives you, and fix it. By the end you can read a
 `NondeterminismError`, name the event id where history and code disagreed, and point at the
 `await` that produced the mismatching Command.
 
+
+**Browser route (Option A):** Open [this lab](http://127.0.0.1:3000/lab/03-determinism), click **Prepare this lab**, then use its action cards. Launches return immediately; **Output** shows progress and results. For a variation below, paste one `python ...` command into **Run another command**. The terminal blocks remain available for Option B.
+
 `workflows.py` is lab 2's `AgentRun` plus the two things a real agent is tempted to do in Workflow
 code: consult the clock in `plan()` (a time budget) and consult the model in `plan()` (the next
 step). The environment variable `LAB03_BREAK` selects which *build* a Worker runs — `none`
@@ -164,3 +167,16 @@ is asked and `next: finish` every time after, and prints a line per request. Ter
 build and asserts the replay fails at event 5 once the budget has passed, then replays clean
 under the fixed build; and runs the `network` build against an in-process model server, asserting
 the replay costs a third model call and fails, while the fixed build's replay costs none.
+
+## What you learned
+
+- Replay requires the same Workflow commands in the same order for the same history.
+- Reading randomness, wall time, or a network result in Workflow decisions can change those commands.
+- Move effects into Activities and replay old histories before deploying changed Workflow code.
+
+## Questions to answer
+
+1. At which recorded Event does the broken clock build first disagree with its history?
+2. Why can a network read in `plan()` create an extra model call during replay?
+3. Which value should be recorded as an Activity result, and which decision stays in Workflow code?
+4. Why does starting a fixed Worker recover a stuck run without restarting its Workflow ID?
