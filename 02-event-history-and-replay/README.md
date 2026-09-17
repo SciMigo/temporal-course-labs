@@ -24,23 +24,32 @@ and `workflow.logger` lines before every `await` — the SDK suppresses those du
 first one a Worker prints is the first Command it actually issued. Reading page: "Event History
 and Replay".
 
-One model underlies every step below. Keep it in view:
+One model underlies every step below. The figure at the top of this lab's page draws it with the
+Events of 2.3's handoff (in the repo: `figures/replay-handoff.svg`).
 
-```text
-   WORKER                                          SERVICE
-   Workflow code
-        |
-   execute_activity()  --- ScheduleActivityTask -->  ActivityTaskScheduled
-                                                     (the Activity runs on a Worker)
-                                                     ActivityTaskCompleted
-        |                                                   |
-   Workflow code  <------ next Workflow Task --------------- +
-        |
-      REPLAY: run the same code again from line one
-        |
-   execute_activity()  --- same Command? --> yes: consume the recorded result, call nothing
-                                         \-> no:  history is exhausted; issue the Command for real
-```
+**Sticky queues first, because every history in this lab shows them.** Each
+`WORKFLOW_TASK_SCHEDULED` row that `history.py` prints names the queue its Task was put on, marked
+`[normal]` or `[sticky]`. A Worker that has just finished a Workflow Task keeps that Workflow's
+state in memory, in its *cache*. So for the Workflow's next Task the Service normally skips the
+shared queue `lab-02`, where any Worker could take it, and uses a **sticky queue** that only that
+one Worker polls, named after it (`<pid>@<host>-<hex>`). That Worker applies the new Events to the
+state it already holds. The very first Task is always `[normal]`, because no Worker has the Workflow
+yet. Stickiness is only an optimisation: if the Worker never takes the Task (you killed it, say), the
+Service stops using its sticky queue for this execution and offers the Task on `lab-02`, where any
+Worker can take it. In 2.3 that fallback shows up as `WorkflowTaskTimedOut`, 10 s after the Task was
+offered; the Advanced section shows when it does and does not appear.
+
+**Then the two ways a Worker handles a Workflow Task:**
+
+- **It has the Workflow cached** (a sticky Worker, like Worker 1 taking event 8's Task): it applies
+  only the new Events. Nothing is replayed.
+- **It does not** (a new process like Worker 2 in 2.3, `replay.py`, or a Worker that has evicted the
+  Workflow from its cache): it runs the Workflow code again from line one, and at each Command the
+  SDK asks what history holds at that position:
+  - **a matching Event:** it takes the recorded result and calls nothing;
+  - **nothing, because history is exhausted:** it issues the Command for real. That is the `live:`
+    line Worker 2 prints in 2.3;
+  - **a different Event:** a non-determinism error, and the Workflow Task fails (lab 3).
 
 ```bash
 export TASK_QUEUE=lab-02          # every terminal; keeps this lab's Workers off other labs' queues
@@ -62,7 +71,8 @@ Every statement below about what history shows was read off the dev server with 
    gives the answer for the 16-event shape; do it without looking, then compare.
 3. Check three things against the reading:
    - Events 8 and 13 are scheduled on a **sticky** queue named `<worker identity>-<hex>`; in this
-     16-event run only event 2 uses the shared queue `lab-02`. That is sticky execution in the log.
+     16-event run only event 2 uses the shared queue `lab-02`, because no Worker had run this
+     Workflow yet. That is sticky execution in the log.
      (A crashed Worker adds a second `lab-02` scheduling; that history is in the Advanced section.)
    - Every `worker=` identity is `<pid>@<host>` — the same process for all of 1–11 in a run
      with one Worker.
@@ -105,7 +115,8 @@ Every statement below about what history shows was read off the dev server with 
 2. Within the 20 s, save what Worker 1 saw and crash it:
    `python history.py agent-42 > before.txt`, then `kill -9 <pid>`.
 3. Wait until the Web UI shows `WorkflowTaskTimedOut` (about 30 s after the kill: the timer
-   fires at 20 s, the stale Task times out 10 s later), then terminal 1: `python worker.py` —
+   fires at 20 s, and the Task offered on dead Worker 1's sticky queue times out 10 s later), then
+   terminal 1: `python worker.py` —
    a new pid, so a new identity.
 4. When it completes: `python history.py agent-42 > after.txt` and `diff before.txt after.txt`.
    The diff is only additions after event 11: the prefix is byte-identical, the continuation

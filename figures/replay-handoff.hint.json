@@ -1,0 +1,111 @@
+{
+  "type": "sequence_diagram",
+  "params": {
+    "theme": "dark",
+    "event_label": "event",
+    "participants": [
+      {
+        "id": "w1",
+        "label": "Worker 1",
+        "sub": "first process"
+      },
+      {
+        "id": "svc",
+        "label": "Temporal Service"
+      },
+      {
+        "id": "w2",
+        "label": "Worker 2",
+        "sub": "started after the kill"
+      }
+    ],
+    "rows": [
+      {
+        "from": "w1",
+        "to": "svc",
+        "label": "ScheduleActivityTask(call_llm)",
+        "event": 5,
+        "tone": "warning"
+      },
+      {
+        "from": "svc",
+        "to": "w1",
+        "label": "Activity Task: call_llm runs (#1)",
+        "event": 6,
+        "tone": "primary",
+        "style": "dashed"
+      },
+      {
+        "from": "w1",
+        "to": "svc",
+        "label": "result → ActivityTaskCompleted",
+        "event": 7,
+        "tone": "warning"
+      },
+      {
+        "from": "svc",
+        "to": "w1",
+        "label": "Workflow Task on the sticky queue",
+        "event": 8,
+        "tone": "primary",
+        "style": "dashed"
+      },
+      {
+        "note": "cached: applies 7, no replay",
+        "over": "w1"
+      },
+      {
+        "from": "w1",
+        "to": "svc",
+        "label": "StartTimer(20 s) → TimerStarted",
+        "event": 11,
+        "tone": "warning"
+      },
+      {
+        "gap": "kill -9 Worker 1; the timer keeps running",
+        "breaks": [
+          "w1",
+          "w2"
+        ]
+      },
+      {
+        "self": "svc",
+        "label": "TimerFired",
+        "event": 12,
+        "tone": "primary"
+      },
+      {
+        "note": "13 sticky offer · 14 timed out",
+        "over": "svc",
+        "event": 14
+      },
+      {
+        "from": "svc",
+        "to": "w2",
+        "label": "Workflow Task on lab-02 (shared)",
+        "event": 15,
+        "tone": "primary",
+        "style": "dashed"
+      },
+      {
+        "note": "no cache: replay from line one",
+        "over": "w2"
+      },
+      {
+        "note": "execute_activity matches 5 → 7",
+        "over": "w2"
+      },
+      {
+        "note": "sleep(20) matches 11 → 12",
+        "over": "w2"
+      },
+      {
+        "from": "w2",
+        "to": "svc",
+        "label": "CompleteWorkflowExecution (live)",
+        "event": 18,
+        "tone": "warning"
+      }
+    ]
+  }
+}

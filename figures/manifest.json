@@ -3,6 +3,10 @@
     "svg": "worker-outage-timeline.svg",
     "caption": "The Service records TimerFired and queues a Workflow Task while no Worker runs. Worker B replays when it returns."
   },
+  "02": {
+    "svg": "replay-handoff.svg",
+    "caption": "Lab 2.3's handoff, read off a real history. Worker 1 holds AgentRun in its cache and applies only new Events; Worker 2 has no cache, replays from line one, and its first live Command is the return."
+  },
   "05": {
     "svg": "message-paths.svg",
     "caption": "Signals, Queries, and Updates follow different paths. Predict which requests leave an Event before you run the experiment."
