@@ -8,19 +8,9 @@ run lives here.
 Each lab kills something on purpose — a Worker, a Task Queue, a deploy, a tenant's assumptions — and
 then asks you to explain what survived and why.
 
-```bash
-git clone https://github.com/SciMigo/temporal-course-labs.git
-cd temporal-course-labs
-
-docker compose up -d                       # Temporal dev server: gRPC :7233, Web UI :8233
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-
-export TASK_QUEUE=lab-01                   # in EVERY terminal for a given lab
-cd 01-the-machine
-python worker.py                           # terminal 1
-python starter.py                          # terminal 2
-```
+Choose the [terminal walkthrough](#on-a-macbook-start-to-finish) or the
+[local page](#or-run-them-from-a-local-page) to start Lab 1. The local page handles the lab's Python
+environment and Task Queue for you.
 
 The Worker runs on your machine, not in the container, so you can `kill -9` it from a second
 terminal while watching the Web UI. That action is the day-one lesson.
@@ -54,21 +44,20 @@ cd temporal-course-labs
 docker compose up -d                       # dev server: gRPC :7233, Web UI :8233
 open http://localhost:8233                 # leave this tab open for the whole course
 
-python3.12 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+python3.12 -m venv .venv
+./.venv/bin/pip install -r requirements.txt
 
-export TASK_QUEUE=lab-01                   # in EVERY terminal for this lab
+export TASK_QUEUE=lab-01
 cd 01-the-machine
-python worker.py                           # terminal 1 — it prints its own pid
+../.venv/bin/python worker.py
 ```
 
-Second terminal:
+In a second terminal, `cd` to the same `01-the-machine` directory (`pwd` in the first terminal
+shows its full path), then run:
 
 ```bash
-cd temporal-course-labs && source .venv/bin/activate
-export TASK_QUEUE=lab-01                   # again: a Worker and a Client on different queues
-cd 01-the-machine                          # wait for each other forever, with no error anywhere
-python starter.py
+export TASK_QUEUE=lab-01
+../.venv/bin/python starter.py
 ```
 
 `starter.py` waits for the result, then prints the history. With nothing killed it ends at **event
@@ -98,7 +87,7 @@ process is running it*. So kill the Worker and then **leave it dead**.
 15  WORKFLOW_TASK_SCHEDULED  reoffered on the shared queue — and it waits here
 ```
 
-5. Now `python worker.py` again. The run finishes, and the identity on event 16 is a **different
+5. Now `../.venv/bin/python worker.py` again from `01-the-machine`. The run finishes, and the identity on event 16 is a **different
    pid** from the one you killed:
 
 ```text

@@ -9,18 +9,37 @@ look at the result, repeat) whose parts have fixed names — `plan()` decides in
 same file. Reading page: "The program this course builds".
 
 ## 1.1 Bring it up
-On the local lab page (Option A), use the **Run it here** buttons above for steps 1–3, then continue
-at step 4. The commands in steps 1–3 are for the terminal path (Option B).
+**Option A — local page:** Click **Prepare this lab**, **Start Worker**, then **Run starter.py** in
+the panel above. These buttons install the lab's Python packages, set `TASK_QUEUE=lab-01`, and use the
+right working directory. Do not run the terminal commands below.
 
-1. `docker compose up -d` in `labs/`; open http://localhost:8233.
-2. `export TASK_QUEUE=lab-01` in **every** terminal you open for this lab. The Worker polls that
-   queue and the Client starts the Workflow on it; name them differently and the Workflow is created
-   and then waits forever, with no error anywhere — Temporal creates Task Queues on first use and
-   cannot know you meant a different one. Both scripts print the queue they use: if the name in the
-   Worker's first line differs from the one in `started agent-42 on ...`, that is your hang.
-3. Terminal 1: `python worker.py`. Terminal 2: `python starter.py`.
-4. In the UI, find `agent-42`. Read the events: `ActivityTaskScheduled  call_llm`, then `TimerStarted`.
-   Write down every event id so far, the pending timer, and the Worker identity on the Workflow Tasks.
+**Option B — terminals:** In the `temporal-course-labs` directory, create a virtual environment
+with Python 3.11 or newer, install the packages, and enter the Lab 1 directory. The command below
+uses Python 3.12; on Linux, substitute another installed Python 3.11+ if needed.
+
+```bash
+python3.12 -m venv .venv
+./.venv/bin/pip install -r requirements.txt
+docker compose up -d
+cd 01-the-machine
+export TASK_QUEUE=lab-01
+../.venv/bin/python worker.py
+```
+
+In a second terminal, `cd` to that same `01-the-machine` directory (`pwd` in the first terminal
+shows its full path), then run:
+
+```bash
+export TASK_QUEUE=lab-01
+../.venv/bin/python starter.py
+```
+
+Both processes must use the same Task Queue. A mismatch leaves the Workflow waiting with no error;
+both scripts print their queue so you can compare them.
+
+In the [Temporal Web UI](http://localhost:8233), find `agent-42`. Read the events:
+`ActivityTaskScheduled  call_llm`, then `TimerStarted`. Write down every event id so far, the pending
+timer, and the Worker identity on the Workflow Tasks.
 
 ## 1.2 Kill the Worker, and leave it dead
 The point of this experiment is not that a Workflow survives a restart. It is *where* the program
@@ -43,7 +62,8 @@ lives while no process is running it. So do not restart anything yet.
 4. Note what did *not* happen: the Workflow did not fail, did not roll back, and did not finish. It
    is Running, with a Workflow Task scheduled and nobody to take it. The timer has already fired, so
    the execution is no longer waiting for time. It is waiting for compute.
-5. Now `python worker.py` again. The new Worker takes that waiting task, replays, and the Workflow
+5. Now click **Start Worker** again (Option A), or run `../.venv/bin/python worker.py` in the Lab 1
+   directory (Option B). The new Worker takes that waiting task, replays, and the Workflow
    completes: `WorkflowTaskStarted`, `WorkflowTaskCompleted`, `WorkflowExecutionCompleted`. Note the
    identity on the last Workflow Task — a different process from the one you killed.
 6. Count the `call_llm key=...` log lines across both Worker terminals (the killed Worker's output is

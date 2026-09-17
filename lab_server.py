@@ -257,7 +257,23 @@ def lab_page(name: str) -> bytes | None:
     if not readme.exists():
         return None
     files = sorted(p.name for p in d.glob("*.py"))
-    body = md_to_html(readme.read_text(encoding="utf-8"), name)
+    lab_text = readme.read_text(encoding="utf-8")
+    if name == "01-the-machine":
+        # The README also serves the terminal path. The local page already has the buttons above,
+        # so show the browser-specific first step instead of repeating terminal setup commands.
+        start = lab_text.index("## 1.1 Bring it up")
+        end = lab_text.index("## 1.2 Kill the Worker", start)
+        lab_text = (lab_text[:start] + """## 1.1 Bring it up
+Your three setup terminals are already running. Click **1 · Prepare this lab** above to install its
+Python packages and set `TASK_QUEUE=lab-01`, then **2 · Start Worker** and **3 · Run starter.py**.
+You do not need to change directories or run Python commands in a terminal for Option A.
+
+In the [Temporal Web UI](http://localhost:8233), find `agent-42`. Read the events:
+`ActivityTaskScheduled  call_llm`, then `TimerStarted`. Write down every event id so far, the pending
+timer, and the Worker identity on the Workflow Tasks.
+
+""" + lab_text[end:])
+    body = md_to_html(lab_text, name)
     body += ('<h2>Files in this lab</h2><ul>'
              + "".join(f"<li><code>{html.escape(f)}</code></li>" for f in files) + "</ul>")
     body = console_panel(name, d) + body
