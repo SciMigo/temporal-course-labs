@@ -4,6 +4,12 @@ Goal: test `AgentRun` three ways — Workflow tests in the time-skipping environ
 tests with a fake context, and replay tests over recorded histories — then inject failures on
 purpose, and finally read a broken history with no source and say what happened.
 
+## Objective
+
+**Why:** Turn the failure behavior of the agent into repeatable tests.
+
+**By the end:** Use time-skipping, replay, Activity fakes, and injected failures to catch regressions before deployment.
+
 
 `workflows.py` is AgentRun at stage 8: the loop from labs 1–7 (`plan()`, `call_llm`,
 `execute_tool` with timeouts / RetryPolicy / heartbeats / idempotency key, the L05 Signals,

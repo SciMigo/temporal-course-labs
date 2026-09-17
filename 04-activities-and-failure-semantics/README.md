@@ -5,6 +5,12 @@ checkpoint carry a tool run across a Worker death; make a side effect happen twi
 it cannot; and write down `execute_tool`'s timeouts, retry policy, heartbeat and key with a reason
 for each number.
 
+## Objective
+
+**Why:** Decide how an Activity should recover from timeout, crash, and duplicate execution.
+
+**By the end:** Identify four timeout events, resume work from a heartbeat, and use a stable key to prevent a duplicate effect.
+
 
 `AgentRun` gains its second Activity here: `execute_tool(call: ToolCall) -> ToolResult`, keyed,
 heartbeating, with a `RetryPolicy`. `AgentRun.run(goal, scenario)` plans three steps — `call_llm`,

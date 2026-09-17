@@ -3,6 +3,12 @@
 Goal: keep AgentRun's history bounded without losing its identity, and delegate a research task to
 a Child Workflow that has a history — and a Worker — of its own.
 
+## Objective
+
+**Why:** Keep a long-running agent small and delegate independent work.
+
+**By the end:** Trace a continue-as-new chain and a Child Workflow through their separate histories and Worker failures.
+
 
 Same program as lab 5 plus two things in `workflows.py`: the continue-as-new check at the top of
 the loop, with `AgentState` as the checkpoint, and a `research` step that `plan()` hands to

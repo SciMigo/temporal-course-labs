@@ -5,6 +5,12 @@ work on three lanes with three Worker pools, stall one pool and read the stall f
 answer the operator's five questions about a run you did not start — from the UI and from the Python
 client. Reading page: "Operating Temporal in Production"; long form in appendices A1 and A3.
 
+## Objective
+
+**Why:** Operate the agent as separate Workflow, CPU, and GPU lanes.
+
+**By the end:** Register search attributes, route work to Task Queues, and diagnose a stalled lane from the UI and client.
+
 
 Nothing in the agent loop changes. What changes is one keyword argument per Activity call
 (`task_queue=`), one timeout you had probably been leaving unset (`schedule_to_start_timeout`), and

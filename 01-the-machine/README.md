@@ -3,6 +3,12 @@
 Goal: see AgentRun (stage 1: plan one step, call the model once, sleep, finish) survive the death
 of the process running it, then say where the program counter went.
 
+## Objective
+
+**Why:** See which part of an agent run survives when its Worker process dies.
+
+**By the end:** Start `AgentRun`, kill its Worker during a timer, and explain from the event history why another Worker can finish the same run.
+
 `AgentRun` is the one program this course builds: an agent loop (decide a step, call a model or tool,
 look at the result, repeat) whose parts have fixed names — `plan()` decides in Workflow code, `call_llm` and
 `execute_tool` act as Activities. Stage 1 is deliberately tiny; every later lab adds one capability to this

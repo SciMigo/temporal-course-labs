@@ -5,6 +5,12 @@ separate lanes; run it for 200 steps and prove no run's history grew; break it e
 requirements say it will be broken and watch it recover; then defend every box in writing.
 Reading page: "Capstone — A Durable Agent Runtime" (module 11 of the course).
 
+## Objective
+
+**Why:** Bring together the course’s durability patterns in one agent run.
+
+**By the end:** Run the capstone through multiple lanes, bounded histories, and failure cases; explain what each mechanism protects.
+
 
 Everything is the same names as L01–L10. Nothing here is new; the exam is that it is all in one place.
 

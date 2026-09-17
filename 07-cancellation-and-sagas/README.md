@@ -4,6 +4,12 @@ Goal: make AgentRun undo what it did when step four of four fails, prove the und
 Worker death, and then find out what `handle.cancel()` does — and does not do — to an Activity
 that is already running.
 
+## Objective
+
+**Why:** Make a multi-step agent undo completed effects when a later step fails.
+
+**By the end:** Observe the compensation order after a crash and test how cancellation reaches a running Activity.
+
 
 Same program as lab 6 plus, in `workflows.py`: `gpu_lane()` (four Activities, each success
 appending its undo to `self.compensations`), `rollback()` (the list in reverse, run from `finally`),

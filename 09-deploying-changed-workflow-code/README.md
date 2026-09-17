@@ -6,6 +6,12 @@ into state). Ship it three ways: fail the replay test and patch (9.1), run v1 an
 side by side with Worker Versioning (9.2), and let a pinned agent upgrade at its next
 continue-as-new (9.3).
 
+## Objective
+
+**Why:** Ship changed Workflow code without breaking runs that began on an older build.
+
+**By the end:** Use replay tests and Worker routing to compare versions and identify a history that new code cannot replay.
+
 
 ```
 labs/09-deploying-changed-workflow-code/

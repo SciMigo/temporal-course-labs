@@ -4,6 +4,12 @@ Goal: read the real history of lab 1's `AgentRun` event by event, predict what t
 append next, hand the execution from one Worker to another and diff what each one saw, then replay
 a history by hand and check yourself against the SDK.
 
+## Objective
+
+**Why:** Learn to read the event history as the source of a Workflow’s progress.
+
+**By the end:** Predict the next event, hand a run to another Worker, and compare a manual replay with the SDK’s replay.
+
 
 The program is unchanged from lab 1 (`plan()` → `call_llm` → 20 s timer → finish). Two
 instruments were added to `workflows.py`: a `CALL_LLM_INVOCATIONS` counter inside the Activity,
