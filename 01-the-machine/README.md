@@ -13,14 +13,14 @@ same file. Reading page: "The program this course builds".
 the panel above. These buttons install the lab's Python packages, set `TASK_QUEUE=lab-01`, and use the
 right working directory. Do not run the terminal commands below.
 
-**Option B — terminals:** In the `temporal-course-labs` directory, create a virtual environment
-with Python 3.11 or newer, install the packages, and enter the Lab 1 directory. The command below
-uses Python 3.12; on Linux, substitute another installed Python 3.11+ if needed.
+**Option B — terminals:** Leave the Temporal dev server from the course setup running. In the
+`temporal-course-labs` directory, create a virtual environment with Python 3.11 or newer, install
+the packages, and enter the Lab 1 directory. The command below uses Python 3.12; on Linux,
+substitute another installed Python 3.11+ if needed.
 
 ```bash
 python3.12 -m venv .venv
 ./.venv/bin/pip install -r requirements.txt
-docker compose up -d
 cd 01-the-machine
 export TASK_QUEUE=lab-01
 ../.venv/bin/python worker.py
