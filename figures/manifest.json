@@ -1,0 +1,14 @@
+{
+  "01": {
+    "svg": "worker-outage-timeline.svg",
+    "caption": "The Service records TimerFired and queues a Workflow Task while no Worker runs. Worker B replays when it returns."
+  },
+  "05": {
+    "svg": "message-paths.svg",
+    "caption": "Signals, Queries, and Updates follow different paths. Predict which requests leave an Event before you run the experiment."
+  },
+  "10": {
+    "svg": "queue-lanes.svg",
+    "caption": "Workflow code chooses the Task Queue for each Activity; a matching Worker pool polls that lane."
+  }
+}

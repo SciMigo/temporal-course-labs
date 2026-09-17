@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="720" style="width:720px;max-width:none;height:auto" role="img" aria-labelledby="outage-title outage-desc">
+  <title id="outage-title">Worker outage timeline</title>
+  <desc id="outage-desc">Four moments in two lanes. Worker A runs and then dies. While no Worker exists, the Temporal Service records TimerFired and queues a task. Worker B later replays history and completes the run.</desc>
+  <rect x="0" y="0" width="800" height="480" rx="14" fill="#161c26" stroke="rgba(242,166,60,0.30)" stroke-width="2"/>
+  <defs>
+    <marker id="outage-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#9aa4b4"/></marker>
+  </defs>
+  <g font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#ebe8e2" text-anchor="middle">
+    <text x="188" y="42">1. Before crash</text><text x="352" y="42">2. Crash</text>
+    <text x="516" y="42">3. Outage</text><text x="680" y="42">4. Recovery</text>
+  </g>
+  <g font-family="Georgia, 'Times New Roman', serif" font-size="23" fill="#ebe8e2">
+    <text x="22" y="114">Worker</text><text x="22" y="273">Service</text>
+  </g>
+  <g fill="#1e2632" stroke="#3a4656" stroke-width="2">
+    <rect x="118" y="67" width="140" height="92" rx="9"/><rect x="282" y="67" width="140" height="92" rx="9" stroke="#ff6b6b"/>
+    <rect x="446" y="67" width="140" height="92" rx="9" stroke-dasharray="8 7"/>
+    <rect x="610" y="67" width="140" height="92" rx="9" stroke="#3ddc84"/>
+    <rect x="118" y="225" width="140" height="112" rx="9"/><rect x="282" y="225" width="140" height="112" rx="9"/>
+    <rect x="446" y="225" width="140" height="112" rx="9" stroke="#f2a63c"/>
+    <rect x="610" y="225" width="140" height="112" rx="9"/>
+  </g>
+  <g font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#ebe8e2" text-anchor="middle">
+    <text x="188" y="106">A runs</text><text x="188" y="136">the code</text>
+    <text x="352" y="106" fill="#ff6b6b">A is killed</text><text x="352" y="136">during timer</text>
+    <text x="516" y="106">No Worker</text><text x="516" y="136">is running</text>
+    <text x="680" y="106" fill="#3ddc84">B replays</text><text x="680" y="136">and finishes</text>
+    <text x="188" y="269">Result saved</text><text x="188" y="299">in history</text>
+    <text x="352" y="269" fill="#f2a63c">TimerStarted</text><text x="352" y="299">already logged</text>
+    <text x="516" y="269" fill="#f2a63c">TimerFired</text><text x="516" y="299">Task queued</text>
+    <text x="680" y="269">Run result</text><text x="680" y="299">recorded</text>
+  </g>
+  <g stroke="#9aa4b4" stroke-width="3" fill="none" marker-end="url(#outage-arrow)">
+    <path d="M260 112h16"/><path d="M424 112h16"/><path d="M588 112h16"/>
+    <path d="M260 280h16"/><path d="M424 280h16"/><path d="M588 280h16"/>
+  </g>
+  <line x1="112" y1="185" x2="752" y2="185" stroke="#3a4656" stroke-width="2"/>
+  <rect x="100" y="375" width="600" height="58" rx="9" fill="#0f131a" stroke="#f2a63c" stroke-width="2"/>
+  <text x="400" y="411" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#f2a63c">Only the Service lane advances during the outage.</text>
+</svg>

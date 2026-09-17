@@ -29,6 +29,23 @@ BULLET = re.compile(r"^\s*[-*] ")
 NUMBER = re.compile(r"^\s*\d+\. ")
 
 LABS = sorted(p for p in ROOT.iterdir() if p.is_dir() and re.match(r"\d\d-", p.name))
+FIGURES = json.loads((ROOT / "figures" / "manifest.json").read_text(encoding="utf-8"))
+
+
+def lab_visual(num: str) -> str:
+    entry = FIGURES.get(num)
+    if not entry:
+        return ""
+    name = entry["svg"]
+    if Path(name).name != name:
+        raise ValueError(f"Invalid figure name: {name}")
+    svg = (ROOT / "figures" / name).read_text(encoding="utf-8")
+    svg = re.sub(r'\swidth="720"', "", svg, count=1)
+    svg = re.sub(r'\sstyle="width:720px;max-width:none;height:auto"', "", svg, count=1)
+    return ('<figure class="concept-figure" id="lab-visual">'
+            '<span class="concept-hint">Swipe to explore diagram →</span>'
+            '<div class="concept-scroll" tabindex="0" role="region" aria-label="Scrollable diagram">'
+            + svg + '</div><figcaption>' + html.escape(entry["caption"]) + '</figcaption></figure>')
 
 
 def action(key: str, title: str, args: list[str], detail: str, kind: str = "command",
@@ -318,7 +335,7 @@ timer, and the Worker identity on the Workflow Tasks.
                   for line in exercise.splitlines() if line.startswith('## '))
     hero = (f'<section class="hero"><span class="eyebrow">LAB {name[:2]} / 11</span>'
             f'<h1>{html.escape(title)}</h1><p>{html.escape(goal)}</p></section>')
-    body = (hero + objective + before + console_panel(name, d) + '<div class="reading-layout" id="exercise">'
+    body = (hero + objective + before + lab_visual(name[:2]) + console_panel(name, d) + '<div class="reading-layout" id="exercise">'
             f'<aside class="toc"><h2>On this page</h2>{toc}</aside>'
             f'<article class="lab-reading">{reading}</article></div>')
     idx = [p.name for p in LABS].index(name)

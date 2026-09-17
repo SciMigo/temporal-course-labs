@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="720" style="width:720px;max-width:none;height:auto" role="img" aria-labelledby="messages-title messages-desc">
+  <title id="messages-title">Signal, Query, and Update message paths</title>
+  <desc id="messages-desc">A Signal is recorded by the Service and handled later. A Query reads state through a live Worker without a history Event. An Update reaches a Worker for validation; accepted Updates enter history and rejected Updates leave no Event.</desc>
+  <rect x="0" y="0" width="800" height="480" rx="14" fill="#161c26" stroke="rgba(242,166,60,0.30)" stroke-width="2"/>
+  <defs><marker id="message-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#9aa4b4"/></marker></defs>
+  <g fill="#0f131a" stroke="#3a4656" stroke-width="2">
+    <rect x="22" y="23" width="756" height="126" rx="10"/>
+    <rect x="22" y="166" width="756" height="126" rx="10"/>
+    <rect x="22" y="309" width="756" height="151" rx="10"/>
+  </g>
+  <g font-family="Georgia, 'Times New Roman', serif" font-size="25" font-weight="bold" text-anchor="middle">
+    <text x="85" y="93" fill="#f2a63c">Signal</text>
+    <text x="85" y="236" fill="#7ba4d9">Query</text>
+    <text x="85" y="386" fill="#3ddc84">Update</text>
+  </g>
+  <g fill="#1e2632" stroke="#3a4656" stroke-width="2">
+    <rect x="160" y="45" width="160" height="80" rx="9"/><rect x="360" y="45" width="165" height="80" rx="9"/><rect x="565" y="45" width="185" height="80" rx="9"/>
+    <rect x="160" y="188" width="160" height="80" rx="9"/><rect x="360" y="188" width="165" height="80" rx="9"/><rect x="565" y="188" width="185" height="80" rx="9"/>
+    <rect x="160" y="344" width="160" height="80" rx="9"/><rect x="360" y="344" width="165" height="80" rx="9"/>
+    <rect x="565" y="321" width="185" height="57" rx="9" stroke="#3ddc84"/>
+    <rect x="565" y="391" width="185" height="57" rx="9" stroke="#ff6b6b"/>
+  </g>
+  <g font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#ebe8e2" text-anchor="middle">
+    <text x="240" y="91">send pause</text><text x="442" y="80">Service logs</text><text x="442" y="108">message</text>
+    <text x="657" y="80">Worker handles</text><text x="657" y="108">later</text>
+    <text x="240" y="234">ask status</text><text x="442" y="223">live Worker</text><text x="442" y="251">reads state</text>
+    <text x="657" y="223">return value</text><text x="657" y="251">no Event</text>
+    <text x="240" y="390">change_goal</text><text x="442" y="379">Worker</text><text x="442" y="407">validates</text>
+    <text x="657" y="357" fill="#3ddc84">accept: Event</text>
+    <text x="657" y="427" fill="#ff6b6b">reject: none</text>
+  </g>
+  <g stroke="#9aa4b4" stroke-width="3" fill="none" marker-end="url(#message-arrow)">
+    <path d="M323 85h32"/><path d="M528 85h32"/>
+    <path d="M323 228h32"/><path d="M528 228h32"/>
+    <path d="M323 384h32"/><path d="M528 366h32"/><path d="M528 404h32"/>
+  </g>
+</svg>

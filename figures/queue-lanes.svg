@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="720" style="width:720px;max-width:none;height:auto" role="img" aria-labelledby="lanes-title lanes-desc">
+  <title id="lanes-title">AgentRun routes Activities to Worker pools through Task Queues</title>
+  <desc id="lanes-desc">Workflow code selects a Task Queue for each Activity. The Temporal Service holds Tasks in premium-models, cpu-tools, gpu-tools, or browser-tools. A matching Worker pool polls each queue. Without pollers, the Task waits and backlog age rises.</desc>
+  <rect x="0" y="0" width="800" height="480" rx="14" fill="#161c26" stroke="rgba(242,166,60,0.30)" stroke-width="2"/>
+  <defs><marker id="lane-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#9aa4b4"/></marker></defs>
+  <g font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#ebe8e2" text-anchor="middle">
+    <text x="135" y="44">AgentRun chooses</text>
+    <text x="400" y="44">Task Queue (Service)</text>
+    <text x="670" y="44">Worker pool polls</text>
+  </g>
+  <g fill="#1e2632" stroke-width="2">
+    <rect x="30" y="66" width="210" height="66" rx="9" stroke="#7ba4d9"/>
+    <rect x="30" y="157" width="210" height="66" rx="9" stroke="#7ba4d9"/>
+    <rect x="30" y="248" width="210" height="66" rx="9" stroke="#7ba4d9"/>
+    <rect x="30" y="339" width="210" height="66" rx="9" stroke="#7ba4d9"/>
+    <rect x="300" y="66" width="200" height="66" rx="9" stroke="#f2a63c"/>
+    <rect x="300" y="157" width="200" height="66" rx="9" stroke="#f2a63c"/>
+    <rect x="300" y="248" width="200" height="66" rx="9" stroke="#f2a63c"/>
+    <rect x="300" y="339" width="200" height="66" rx="9" stroke="#f2a63c"/>
+    <rect x="570" y="66" width="200" height="66" rx="9" stroke="#3ddc84"/>
+    <rect x="570" y="157" width="200" height="66" rx="9" stroke="#3ddc84"/>
+    <rect x="570" y="248" width="200" height="66" rx="9" stroke="#3ddc84"/>
+    <rect x="570" y="339" width="200" height="66" rx="9" stroke="#3ddc84"/>
+  </g>
+  <g font-family="Georgia, 'Times New Roman', serif" font-size="23" fill="#ebe8e2" text-anchor="middle">
+    <text x="135" y="107">call_llm</text>
+    <text x="135" y="198">search / parse</text>
+    <text x="135" y="289">embed / vision</text>
+    <text x="135" y="380">open_page</text>
+    <text x="670" y="107">API key pool</text>
+    <text x="670" y="198">CPU pool</text>
+    <text x="670" y="289">GPU pool</text>
+    <text x="670" y="380">Chromium pool</text>
+  </g>
+  <g font-family="Menlo, Consolas, monospace" font-size="22" fill="#f2a63c" text-anchor="middle">
+    <text x="400" y="107">premium-models</text>
+    <text x="400" y="198">cpu-tools</text>
+    <text x="400" y="289">gpu-tools</text>
+    <text x="400" y="380">browser-tools</text>
+  </g>
+  <g stroke="#9aa4b4" stroke-width="3" fill="none" marker-end="url(#lane-arrow)">
+    <path d="M243 99h51"/><path d="M503 99h61"/>
+    <path d="M243 190h51"/><path d="M503 190h61"/>
+    <path d="M243 281h51"/><path d="M503 281h61"/>
+    <path d="M243 372h51"/><path d="M503 372h61"/>
+  </g>
+  <text x="400" y="452" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#9aa4b4">No poller? The Task waits in its lane; backlog age rises.</text>
+</svg>
