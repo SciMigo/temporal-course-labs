@@ -302,7 +302,7 @@ timer, and the Worker identity on the Workflow Tasks.
 """ + lab_text[end:])
     title, goal, exercise = readme_intro(lab_text)
     objective = ""
-    match = re.search(r"(?ms)^## Objective\n(.*?)(?=^## |\Z)", exercise)
+    match = re.search(r"(?m)^## Objective\n\n(\*\*Why:\*\* [^\n]+\n\n\*\*By the end:\*\* [^\n]+)\n\n", exercise)
     if match:
         objective = '<section class="objective-card" aria-labelledby="objective-heading"><h2 id="objective-heading">Objective</h2>' + md_to_html(match.group(1).strip(), name) + '</section>'
         exercise = exercise[:match.start()] + exercise[match.end():]
