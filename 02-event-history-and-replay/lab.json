@@ -1,0 +1,63 @@
+{
+  "env": {
+    "TASK_QUEUE": "lab-02"
+  },
+  "actions": [
+    {
+      "key": "worker",
+      "title": "Worker 1",
+      "args": [
+        "worker.py"
+      ],
+      "detail": "The first Worker for history and replay.",
+      "kind": "worker",
+      "env": {}
+    },
+    {
+      "key": "worker-2",
+      "title": "Worker 2",
+      "args": [
+        "worker.py"
+      ],
+      "detail": "Use for the two-Worker handoff in 2.3.",
+      "kind": "worker",
+      "env": {}
+    },
+    {
+      "key": "starter",
+      "title": "Start agent-42",
+      "args": [
+        "starter.py"
+      ],
+      "detail": "Starts a run; its output includes history.",
+      "kind": "command",
+      "env": {}
+    },
+    {
+      "key": "history",
+      "title": "Inspect history",
+      "args": [
+        "history.py",
+        "agent-42"
+      ],
+      "detail": "Read the events and attributes for agent-42.",
+      "kind": "command",
+      "env": {}
+    },
+    {
+      "key": "replay",
+      "title": "Replay history",
+      "args": [
+        "replay.py",
+        "agent-42"
+      ],
+      "detail": "Replay the completed run without another model call.",
+      "kind": "command",
+      "env": {}
+    }
+  ],
+  "figure": {
+    "svg": "figure.svg",
+    "caption": "Lab 2.3's handoff, read off a real history. Worker 1 holds AgentRun in its cache and applies only new Events; Worker 2 has no cache, replays from line one, and its first live Command is the return."
+  }
+}

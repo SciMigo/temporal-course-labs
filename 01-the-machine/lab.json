@@ -1,0 +1,31 @@
+{
+  "env": {
+    "TASK_QUEUE": "lab-01"
+  },
+  "actions": [
+    {
+      "key": "worker",
+      "title": "Worker",
+      "args": [
+        "worker.py"
+      ],
+      "detail": "Polls lab-01; crash it during the timer, then run this Worker again to resume.",
+      "kind": "worker",
+      "env": {}
+    },
+    {
+      "key": "starter",
+      "title": "Start agent-42",
+      "args": [
+        "starter.py"
+      ],
+      "detail": "Start this Workflow once. After a Worker crash, run the Worker again instead.",
+      "kind": "command",
+      "env": {}
+    }
+  ],
+  "figure": {
+    "svg": "figure.svg",
+    "caption": "The Service records TimerFired and queues a Workflow Task while no Worker runs. Worker B replays when it returns."
+  }
+}

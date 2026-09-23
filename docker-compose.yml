@@ -1,0 +1,24 @@
+# Temporal dev server for the labs. Free, local, disposable.
+#   docker compose up -d        → gRPC on localhost:7233, Web UI on http://localhost:8233
+#   docker compose down         → history survives in the named volume `temporal-data`
+#   docker compose down -v      → wipe history
+# The volume mounts at the unprivileged user's own home so it can write the SQLite file.
+# A root-owned mount (a bind mount, or a volume at a path the image lacks) dies with
+# "unable to open database file: out of memory (14)".
+#
+# Pinned, not :latest. Every observed output quoted in these labs -- histories, event orders,
+# timeout behaviour, the Lab 10 dispatch tables -- was recorded against the server this tag
+# carries. `temporal version` here reports: 1.8.3 (Server 1.31.2, UI 2.50.1). On :latest a
+# learner would run the same commands six months from now and be told the lab is wrong.
+# Raising it is fine; re-record the observations in the same commit.
+services:
+  temporal:
+    image: temporalio/temporal:1.8.3
+    command: ["server", "start-dev", "--ip", "0.0.0.0", "--db-filename", "/home/temporal/temporal.db"]
+    ports:
+      - "7233:7233"
+      - "8233:8233"
+    volumes:
+      - temporal-data:/home/temporal
+volumes:
+  temporal-data:
