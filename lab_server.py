@@ -244,32 +244,16 @@ def lab_page(name: str) -> bytes | None:
         return None
     files = sorted(p.name for p in d.glob("*.py"))
     lab_text = readme.read_text(encoding="utf-8")
-    if name == "01-the-machine":
-        # The README also serves the terminal path. The local page already has the buttons above,
-        # so show the browser-specific first step instead of repeating terminal setup commands.
-        start = lab_text.index("## 1.1 Bring it up")
-        end = lab_text.index("## 1.2 Kill the Worker", start)
-        lab_text = (lab_text[:start] + """## 1.1 Bring it up
-Your setup services are already running. Click **Prepare this lab**, then **Run Worker** and
-**Start Workflow** on the cards above. The starter keeps running in the background while you do the crash
-experiment; its Output button shows progress and the eventual result.
-You do not need to change directories or run Python commands in a terminal for Option A.
-
-In the [Temporal Web UI](http://localhost:8233), find `agent-42`. Read the events:
-`ActivityTaskScheduled  call_llm`, then `TimerStarted`. Write down every event id so far, the pending
-timer, and the Worker identity on the Workflow Tasks.
-
-""" + lab_text[end:])
     title, goal, exercise = readme_intro(lab_text)
     objective = ""
-    match = re.search(r"(?m)^## Objective\n\n(\*\*Why:\*\* [^\n]+\n\n\*\*By the end:\*\* [^\n]+)\n\n", exercise)
+    match = re.search(r"(?ms)^## Objective\n\n(.*?)(?=^## |\Z)", exercise)
     if match:
         objective = '<section class="objective-card" aria-labelledby="objective-heading"><h2 id="objective-heading">Objective</h2>' + md_to_html(match.group(1).strip(), name) + '</section>'
         exercise = exercise[:match.start()] + exercise[match.end():]
     before = ""
-    match = re.search(r"(?m)^## Before you run\n\n(?:- [^\n]+\n)+\n?", exercise)
+    match = re.search(r"(?ms)^## Before you run\n\n(.*?)(?=^## |\Z)", exercise)
     if match:
-        before = '<section class="before-card" aria-labelledby="before-heading"><h2 id="before-heading">Before you run</h2>' + md_to_html(match.group()[len('## Before you run'):].strip(), name) + '</section>'
+        before = '<section class="before-card" aria-labelledby="before-heading"><h2 id="before-heading">Before you run</h2>' + md_to_html(match.group(1).strip(), name) + '</section>'
         exercise = exercise[:match.start()] + exercise[match.end():]
     reading = md_to_html(exercise, name)
     reading += ('<h2>Files in this lab</h2><ul>'
@@ -328,8 +312,8 @@ def console_panel(name: str, d: Path) -> str:
     return f'''<section class="lab-workspace" aria-labelledby="workspace-heading">
 <div class="workspace-heading"><div><span class="eyebrow">BROWSER WORKSPACE</span>
 <h2 id="workspace-heading">Run this lab</h2>
-<p>Use the controls here if you chose Option A. Each command uses this lab's directory and Python
- environment. Commands launch in the background, so you can inspect history or crash a Worker while
+<p>These are the primary controls for the lab. Each command uses the right directory, Python
+ environment, and Task Queue. Commands launch in the background, so you can inspect history or crash a Worker while
  a run is active. <a href="#exercise">Read the exercise ↓</a></p></div></div>
 <div class="setup-step"><span class="step-number">1</span><div><h3>Prepare</h3>
 <p>Install this lab's packages and set its Task Queue. Temporal and the runtime should say ready above.</p>
@@ -337,13 +321,13 @@ def console_panel(name: str, d: Path) -> str:
 <div class="workspace-subhead"><span class="step-number">2</span><div><h3>Run and observe</h3>
 <p>Choose a starting point below. Open Output to follow the process; Crash Worker sends SIGKILL.</p></div></div>
 <div class="action-grid">{''.join(cards)}</div>
-<div class="command-box"><h3>Run another command from the exercise</h3>
+<details class="command-box"><summary>Advanced: run another command</summary>
 <p>Enter one Python command from this lab, such as <code>{html.escape(example_command)}</code>.
 Use <code>python script.py</code> or <code>python -m pytest</code>; terminal setup commands like
 <code>cd</code> and <code>export</code> do not run here. Each command gets its own output log.</p>
 <div class="command-row"><input id="lab-command" aria-label="Python command" spellcheck="false"
 placeholder="{html.escape(example_command, quote=True)}"><button type="button" class="run primary" id="command-run">Run Python command</button></div>
-<div id="command-history" class="command-history"></div></div>
+<div id="command-history" class="command-history"></div></details>
 <div class="output-heading"><h3>Output</h3><span id="output-name">Select an action to see its output</span></div>
 <pre class="out" id="out-panel" aria-live="polite">No action selected yet.</pre>
 <details class="console-details"><summary>Advanced: Python console</summary>
