@@ -95,6 +95,16 @@ def md_to_html(md: str, lab: str) -> str:
     lines = md.split("\n")
     while i < len(lines):
         line = lines[i]
+        if line.strip() == "<details>":
+            block, i = [], i + 1
+            while i < len(lines) and lines[i].strip() != "</details>":
+                block.append(lines[i]); i += 1
+            i += 1
+            summary = block.pop(0).strip() if block else ""
+            if not re.fullmatch(r"<summary>[^<>]+</summary>", summary):
+                raise ValueError("A details block must begin with a plain-text <summary>")
+            out.append(f"<details>{summary}{md_to_html(chr(10).join(block).strip(), lab)}</details>")
+            continue
         if line.lstrip().startswith("```"):
             lang = line.lstrip()[3:].strip()
             block, i = [], i + 1
